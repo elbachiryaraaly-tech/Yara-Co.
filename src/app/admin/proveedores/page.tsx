@@ -120,18 +120,25 @@ export default async function AdminProveedoresPage({
                 <div className="mt-4 pt-4 border-t border-[var(--border)] flex flex-wrap items-center gap-2">
                   {p.code?.toLowerCase() === "aliexpress" && p.apiKey?.trim() && (
                     <>
-                      <form
-                        method="get"
-                        action={`${getAppBaseUrl()}/api/auth/aliexpress/authorize`}
-                        className="inline"
-                      >
-                        <Button type="submit" variant="outline" size="sm" className="border-[var(--border)] gap-1.5">
+                      <Button variant="outline" size="sm" className="border-[var(--border)] gap-1.5" asChild>
+                        <a
+                          href={`${getAppBaseUrl()}/api/auth/aliexpress/authorize`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center"
+                        >
                           <Link2 className="h-3.5 w-3" />
                           {(p as { accessToken?: string | null }).accessToken ? "Renovar token" : "Conectar con AliExpress"}
-                        </Button>
-                      </form>
+                        </a>
+                      </Button>
                       <p className="text-[10px] text-muted-foreground w-full mt-1">
-                        Callback URL en la app AliExpress: <code className="bg-[var(--elevated)] px-1 rounded">/api/auth/aliexpress/callback</code>
+                        Se abrirá una pestaña nueva. Inicia sesión como <strong>vendedor</strong> (no comprador), autoriza y cierra la pestaña. Luego actualiza esta página (F5).
+                      </p>
+                      <p className="text-[10px] text-muted-foreground w-full">
+                        Si el botón no abre: copia y pega en el navegador:{" "}
+                        <code className="bg-[var(--elevated)] px-1 rounded break-all">
+                          {getAppBaseUrl()}/api/auth/aliexpress/authorize
+                        </code>
                       </p>
                     </>
                   )}
