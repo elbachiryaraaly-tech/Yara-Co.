@@ -6,6 +6,7 @@
 // Authorize en api-sg (openservice). Token: DropShip API usa /rest + /auth/token/create
 const ALIEXPRESS_AUTHORIZE_URL = "https://api-sg.aliexpress.com/oauth/authorize";
 const ALIEXPRESS_REST_BASE = "https://api-sg.aliexpress.com/rest";
+const ALIEXPRESS_TOKEN_CREATE_GET = "https://api-sg.aliexpress.com/rest/auth/token/create";
 const ALIEXPRESS_TOKEN_URLS = [
   "https://api-sg.aliexpress.com/oauth/token",
   "https://api-sg.aliexpress.com/sync/oauth/token",
@@ -92,6 +93,64 @@ function timestampGmt8(): string {
 }
 
 /**
+ * Intenta GET a /rest/auth/token/create (algunas doc indican GET con query params).
+ */
+async function exchangeCodeViaTokenCreateGet(params: {
+  code: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+}): Promise<{ success: true; data: AliExpressTokenResponse } | { success: false; error: string }> {
+  const crypto = await import("crypto");
+  const timestamp = String(Date.now());
+  const payload: Record<string, string> = {
+    app_key: params.clientId,
+    code: params.code,
+    format: "json",
+    redirect_uri: params.redirectUri,
+    sign_method: "sha256",
+    timestamp,
+  };
+  const sortedKeys = Object.keys(payload).sort();
+  const signStr = sortedKeys.map((k) => `${k}${payload[k]}`).join("");
+  payload.sign = crypto.createHmac("sha256", params.clientSecret).update(signStr).digest("hex").toUpperCase();
+  const url = new URL(ALIEXPRESS_TOKEN_CREATE_GET);
+  sortedKeys.forEach((k) => url.searchParams.set(k, payload[k]));
+  url.searchParams.set("sign", payload.sign);
+  const res = await fetch(url.toString(), { method: "GET", headers: { Accept: "application/json" } });
+  const text = await res.text();
+  let json: Record<string, unknown>;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    return { success: false, error: `Token create GET: no JSON (${res.status})` };
+  }
+  const errCode = (json.gopErrorCode as string) ?? (json.code as string);
+  const errMsg = (json.gopErrorMsg as string) ?? (json.msg as string) ?? (json.message as string) ?? "";
+  if (errCode && String(errCode) !== "0") {
+    return { success: false, error: errMsg ? `[${errCode}] ${errMsg}` : String(errCode) };
+  }
+  const bodyStr = (json.gopResponseBody as string) ?? text;
+  let body: Record<string, unknown>;
+  try {
+    body = typeof bodyStr === "string" ? (JSON.parse(bodyStr) as Record<string, unknown>) : (bodyStr as Record<string, unknown>);
+  } catch {
+    body = json;
+  }
+  const access_token = (body.access_token as string) ?? (json.access_token as string);
+  if (!access_token) return { success: false, error: "Token create GET: sin access_token" };
+  return {
+    success: true,
+    data: {
+      access_token,
+      refresh_token: (body.refresh_token as string) ?? (json.refresh_token as string),
+      expire_time: (body.expire_time as string) ?? (json.expire_time as string),
+      refresh_token_valid_time: (body.refresh_token_valid_time as string) ?? (json.refresh_token_valid_time as string),
+    },
+  };
+}
+
+/**
  * Canje de code por token usando la API REST de DropShippers (/auth/token/create).
  * Doc: openservice.aliexpress.com → DropShippers API Developer → Create token.
  * Prueba varias variantes de parámetros y firma según documentación Alibaba/TOP.
@@ -173,6 +232,8 @@ export async function exchangeCodeForToken(params: {
   clientSecret: string;
   redirectUri: string;
 }): Promise<{ success: true; data: AliExpressTokenResponse } | { success: false; error: string }> {
+  const getResult = await exchangeCodeViaTokenCreateGet(params);
+  if (getResult.success) return getResult;
   const restResult = await exchangeCodeViaDropShipRest(params);
   if (restResult.success) return restResult;
 

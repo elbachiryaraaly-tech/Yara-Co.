@@ -54,7 +54,10 @@ export default async function AdminProveedoresPage({
             Opción 1: Con apps de openservice.aliexpress.com puedes intentar obtener el token manualmente. Entra en tu app → Auth Management o Documentation → &quot;Get token&quot; / &quot;Obtain token&quot; → copia el <strong>access_token</strong> y pégalo aquí en <strong>Configurar API</strong> → Access Token.
           </p>
           <p className="text-muted-foreground text-xs">
-            Opción 2: Si el error anterior habla de &quot;code&quot; o &quot;expired&quot;, vuelve a pulsar <strong>Conectar con AliExpress</strong> e inicia sesión y autoriza de nuevo (el código caduca en unos minutos).
+            Opción 2: Si el error dice <strong>&quot;appkey not exists&quot;</strong>: (1) Confirma que en <strong>Configurar API</strong> has guardado la App Key correcta (ej. 529586) y el App Secret. (2) Si tu app está en estado <strong>Test</strong> en AliExpress, pásala a <strong>Online</strong> en la consola (App Overview → Apply Offline/Edit o solicitar go live).
+          </p>
+          <p className="text-muted-foreground text-xs">
+            Opción 3: Si el error habla de &quot;code&quot; o &quot;expired&quot;, vuelve a pulsar <strong>Conectar con AliExpress</strong> e inicia sesión y autoriza de nuevo (el código caduca en unos minutos).
           </p>
           <p className="text-muted-foreground text-xs mt-2">El token puede caducar (p. ej. 30 días); cuando la API lo pida, repite el proceso o usa &quot;Renovar token&quot;.</p>
         </div>
