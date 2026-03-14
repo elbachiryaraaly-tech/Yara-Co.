@@ -1,0 +1,119 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+const testimonials = [
+  {
+    quote: "La mejor tienda de lujo online. El perfume que pedí superó mis expectativas. Envío rápido y packaging impecable.",
+    author: "María G.",
+  },
+  {
+    quote: "Reloj recibido en 48h. Calidad excepcional y atención al cliente de 10. Repetiré sin dudarlo.",
+    author: "Carlos R.",
+  },
+  {
+    quote: "Yara & Co. ha redefinido mi forma de comprar lujo. Todo auténtico, precios justos y una web preciosa.",
+    author: "Laura M.",
+  },
+];
+
+export function Testimonials() {
+  return (
+    <section className="relative py-24 lg:py-32 border-t border-[var(--border)] bg-gradient-to-b from-[var(--ink)] to-[var(--card)] overflow-hidden">
+      {/* Efectos de fondo decorativos */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[var(--gold)]/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[var(--gold)]/20 rounded-full blur-3xl" />
+      </div>
+      
+      <div className="container mx-auto px-6 lg:px-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.p
+            className="text-[var(--gold)] text-sm uppercase tracking-[0.2em] mb-4 flex items-center gap-3"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <motion.span
+              className="h-px w-8 bg-[var(--gold)]"
+              initial={{ width: 0 }}
+              whileInView={{ width: 32 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            />
+            Testimonios
+          </motion.p>
+          <motion.h2
+            className="font-display text-display-sm text-[var(--foreground)] tracking-tighter mb-16 lg:mb-24"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Lo que dicen nuestros clientes
+          </motion.h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+          {testimonials.map((t, i) => (
+            <motion.blockquote
+              key={t.author}
+              className="group relative border-l-2 border-[var(--gold)]/30 hover:border-[var(--gold)] pl-8 pr-4 py-4 transition-all duration-500 hover:bg-[var(--card)]/50 rounded-r-lg"
+              initial={{ opacity: 0, y: 30, x: -20 }}
+              whileInView={{ opacity: 1, y: 0, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ x: 8, scale: 1.02 }}
+            >
+              {/* Comillas decorativas */}
+              <motion.div
+                className="absolute -top-4 -left-2 text-6xl text-[var(--gold)]/10 font-display"
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 + i * 0.1 }}
+              >
+                &ldquo;
+              </motion.div>
+              
+              <motion.p
+                className="font-display text-xl lg:text-2xl text-[var(--foreground)] leading-snug italic mb-6 relative z-10"
+                whileHover={{ color: "var(--gold)" }}
+                transition={{ duration: 0.3 }}
+              >
+                {t.quote}
+              </motion.p>
+              
+              <motion.footer
+                className="text-sm text-muted-foreground uppercase tracking-wider flex items-center gap-2"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+              >
+                <motion.span
+                  className="text-[var(--gold)]"
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                >
+                  ✦
+                </motion.span>
+                {t.author}
+              </motion.footer>
+              
+              {/* Línea decorativa inferior */}
+              <motion.div
+                className="absolute bottom-0 left-8 right-0 h-px bg-gradient-to-r from-[var(--gold)]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              />
+            </motion.blockquote>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

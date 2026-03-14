@@ -1,0 +1,351 @@
+// YaraLuxe - Prisma Schema
+// Base de datos para e-commerce de lujo con dropshipping
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USUARIOS Y AUTENTICACIÓN ============
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  name          String?
+  image         String?
+  role          String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  addresses     ShippingAddress[]
+  cart          CartItem[]
+  couponsUsed   CouponUsage[]
+  referralCode  String?           @unique
+  referredById  String?
+  referredBy    User?             @relation("Referrals", fields: [referredById], references: [id])
+  referrals     User[]            @relation("Referrals")
+  loyaltyPoints Int               @default(0)
+}
+
+// UserRole: CUSTOMER | ADMIN (guardado como String en SQLite)
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============ CATÁLOGO ============
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    String?
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+  order       Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Product {
+  id                String                @id @default(cuid())
+  name              String
+  slug              String                @unique
+  description       String?
+  shortDescription  String?
+  price             Decimal               @default(0)
+  compareAtPrice    Decimal?
+  costPrice         Decimal?
+  sku               String?               @unique
+  stock             Int                   @default(0)
+  trackInventory    Boolean               @default(true)
+  isActive          Boolean               @default(true)
+  isFeatured        Boolean               @default(false)
+  rating            Decimal?
+  reviewCount       Int                   @default(0)
+  weight            Decimal?
+  metaTitle         String?
+  metaDescription   String?
+  tags              String                @default("[]") // JSON array de strings
+  badges            String                @default("[]") // JSON array: NUEVO, EXCLUSIVO, etc.
+  categoryId        String?
+  category          Category?             @relation(fields: [categoryId], references: [id])
+  providerId        String?
+  providerProductId String?
+  provider          DropshippingProvider? @relation(fields: [providerId], references: [id])
+  images            ProductImage[]
+  variants          ProductVariant[]
+  orderItems        OrderItem[]
+  reviews           Review[]
+  wishlistItems     WishlistItem[]
+  cartItems         CartItem[]
+  dealEndsAt        DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  alt       String?
+  order     Int     @default(0)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id                String      @id @default(cuid())
+  name              String // ej: "Oro Rosa / 40ml"
+  sku               String?     @unique
+  price             Decimal     @default(0)
+  compareAtPrice    Decimal?
+  stock             Int         @default(0)
+  options           String      @default("{}") // JSON: { size: "40ml", color: "Oro Rosa" }
+  imageUrl          String?
+  productId         String
+  product           Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  providerVariantId String? // CJ: vid (UUID) o SKU de variante en el proveedor
+  orderItems        OrderItem[]
+  cartItems         CartItem[]
+}
+
+// ============ PEDIDOS Y PAGOS ============
+model Order {
+  id                String            @id @default(cuid())
+  orderNumber       String            @unique
+  userId            String?
+  user              User?             @relation(fields: [userId], references: [id])
+  email             String
+  status            String            @default("PENDING")
+  subtotal          Decimal           @default(0)
+  discount          Decimal           @default(0)
+  shipping          Decimal           @default(0)
+  tax               Decimal           @default(0)
+  total             Decimal           @default(0)
+  currency          String            @default("USD")
+  couponCode        String?
+  shippingAddressId String?
+  shippingAddress   ShippingAddress?  @relation(fields: [shippingAddressId], references: [id])
+  items             OrderItem[]
+  payments          Payment[]
+  trackingNumber    String?
+  trackingUrl       String?
+  providerOrderId   String?
+  notes             String?
+  dropshippingLogs  DropshippingLog[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+// OrderStatus: PENDING | PAID | PROCESSING | SHIPPED | DELIVERED | CANCELLED | REFUNDED
+
+model OrderItem {
+  id        String          @id @default(cuid())
+  orderId   String
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product         @relation(fields: [productId], references: [id])
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity  Int
+  price     Decimal         @default(0)
+  total     Decimal         @default(0)
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount            Decimal  @default(0)
+  currency          String
+  provider          String // stripe, paypal
+  providerPaymentId String?
+  status            String   @default("PENDING")
+  metadata          String? // JSON
+  createdAt         DateTime @default(now())
+}
+
+// PaymentStatus: PENDING | COMPLETED | FAILED | REFUNDED
+
+// ============ DIRECCIONES ============
+model ShippingAddress {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  address1  String
+  address2  String?
+  city      String
+  state     String?
+  zip       String
+  country   String
+  phone     String?
+  isDefault Boolean @default(false)
+  orders    Order[]
+}
+
+// ============ REVIEWS ============
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int
+  title      String?
+  content    String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+// ============ WISHLIST ============
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+// ============ CARRITO ============
+model CartItem {
+  id        String          @id @default(cuid())
+  userId    String?
+  user      User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  productId String
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity  Int             @default(1)
+  createdAt DateTime        @default(now())
+}
+
+// ============ CUPONES ============
+model Coupon {
+  id          String        @id @default(cuid())
+  code        String        @unique
+  type        String // PERCENTAGE | FIXED
+  value       Decimal       @default(0)
+  minPurchase Decimal?
+  maxUses     Int?
+  usedCount   Int           @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  isActive    Boolean       @default(true)
+  usages      CouponUsage[]
+}
+
+// CouponType: PERCENTAGE | FIXED
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   String
+  createdAt DateTime @default(now())
+}
+
+// ============ NEWSLETTER ============
+model EmailSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ============ DROPSHIPPING ============
+model DropshippingProvider {
+  id           String            @id @default(cuid())
+  name         String // AliExpress, CJDropshipping, etc.
+  code         String? // "cj" | "aliexpress" | etc. — para seleccionar el adaptador de API
+  apiKey       String?
+  apiSecret    String?
+  accessToken  String? // AliExpress Open Platform: token OAuth (obligatorio para crear pedidos)
+  refreshToken String? // Para renovar accessToken automáticamente cuando caduque
+  baseUrl      String? // URL base de la API si el proveedor lo requiere
+  isActive     Boolean           @default(true)
+  products     Product[]
+  syncs        Sync[]
+  logs         DropshippingLog[]
+}
+
+model Sync {
+  id          String               @id @default(cuid())
+  providerId  String
+  provider    DropshippingProvider @relation(fields: [providerId], references: [id])
+  type        String // inventory, orders, products
+  status      String // pending, completed, failed
+  startedAt   DateTime             @default(now())
+  completedAt DateTime?
+  details     String? // JSON
+}
+
+// Registro de cada intento de envío al proveedor: auditoría, reintentos y diagnóstico
+model DropshippingLog {
+  id              String               @id @default(cuid())
+  orderId         String
+  order           Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  providerId      String
+  provider        DropshippingProvider @relation(fields: [providerId], references: [id])
+  status          String // "pending" | "sent" | "failed"
+  providerOrderId String?
+  trackingNumber  String?
+  trackingUrl     String?
+  errorMessage    String? // si status === "failed"
+  attemptNumber   Int                  @default(1)
+  rawResponse     String? // JSON respuesta cruda para depuración
+  attemptedAt     DateTime             @default(now())
+  completedAt     DateTime?
+}

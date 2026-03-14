@@ -1,0 +1,19 @@
+BASE DE DATOS: SQLite (sin contraseña)
+======================================
+
+El proyecto usa SQLite. No necesitas PostgreSQL ni contraseñas.
+El archivo de base de datos se crea en: prisma/dev.db
+
+PASOS (solo una vez):
+
+1. Cierra el servidor de desarrollo si está en marcha (Ctrl+C en la terminal donde corre "npm run dev").
+
+2. En la carpeta del proyecto ejecuta:
+
+   npm run db:create-and-setup
+
+   Eso creará prisma/dev.db, aplicará las tablas y cargará los datos iniciales.
+
+3. Vuelve a arrancar el proyecto: npm run dev
+
+Si ves "EPERM" al ejecutar db:create-and-setup, cierra Cursor/VS Code y cualquier terminal que tenga "npm run dev" o "next", y vuelve a ejecutar npm run db:create-and-setup.
