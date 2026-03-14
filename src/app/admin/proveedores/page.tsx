@@ -2,6 +2,7 @@ import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb";
 import { AdminAddProvider } from "@/components/admin/AdminAddProvider";
 import { AdminEditProvider } from "@/components/admin/AdminEditProvider";
 import { getAdminProviders } from "@/lib/admin";
+import { getAppBaseUrl } from "@/lib/get-base-url";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Truck, Key, Check, X, Link2, AlertCircle } from "lucide-react";
@@ -119,12 +120,16 @@ export default async function AdminProveedoresPage({
                 <div className="mt-4 pt-4 border-t border-[var(--border)] flex flex-wrap items-center gap-2">
                   {p.code?.toLowerCase() === "aliexpress" && p.apiKey?.trim() && (
                     <>
-                      <Button variant="outline" size="sm" className="border-[var(--border)] gap-1.5" asChild>
-                        <a href="/api/auth/aliexpress/authorize" className="inline-flex items-center">
+                      <form
+                        method="get"
+                        action={`${getAppBaseUrl()}/api/auth/aliexpress/authorize`}
+                        className="inline"
+                      >
+                        <Button type="submit" variant="outline" size="sm" className="border-[var(--border)] gap-1.5">
                           <Link2 className="h-3.5 w-3" />
                           {(p as { accessToken?: string | null }).accessToken ? "Renovar token" : "Conectar con AliExpress"}
-                        </a>
-                      </Button>
+                        </Button>
+                      </form>
                       <p className="text-[10px] text-muted-foreground w-full mt-1">
                         Callback URL en la app AliExpress: <code className="bg-[var(--elevated)] px-1 rounded">/api/auth/aliexpress/callback</code>
                       </p>
