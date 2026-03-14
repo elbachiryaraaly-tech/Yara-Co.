@@ -19,7 +19,7 @@ type Product = {
   rating: { toString(): string } | null;
   reviewCount: number;
   images: { id: string; url: string; alt: string | null }[];
-  variants: { id: string; name: string; price: { toString(): string }; stock: number }[];
+  variants: { id: string; name: string; price: { toString(): string }; stock: number; sku?: string | null }[];
   category: { name: string; slug: string } | null;
   trackInventory?: boolean;
 };
