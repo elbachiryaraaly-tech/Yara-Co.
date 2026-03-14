@@ -2,8 +2,9 @@ import type { DropshippingProviderConfig, IDropshippingAdapter, PlaceOrderParams
 import { noopAdapter } from "./adapters/noop";
 import { cjAdapter } from "./adapters/cj";
 import { aliexpressAdapter } from "./adapters/aliexpress";
+import { printfulAdapter } from "./adapters/printful";
 
-const adapters: IDropshippingAdapter[] = [cjAdapter, aliexpressAdapter];
+const adapters: IDropshippingAdapter[] = [cjAdapter, aliexpressAdapter, printfulAdapter];
 
 export type { DropshippingAddress, DropshippingOrderItem, PlaceOrderParams, PlaceOrderResult, DropshippingProviderConfig } from "./types";
 export { validatePlaceOrderParams } from "./validate";

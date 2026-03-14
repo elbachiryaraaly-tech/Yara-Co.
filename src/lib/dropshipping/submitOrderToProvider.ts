@@ -64,9 +64,9 @@ export async function submitOrderToProvider(
   let provider = order.items[0]!.product.provider;
   if (!provider) return { success: false, logId: "", error: "Proveedor no encontrado" };
 
-  // Re-obtener proveedor con accessToken (AliExpress OAuth; CJ para reutilizar token y evitar 429)
+  // Re-obtener proveedor con accessToken (AliExpress OAuth; CJ/Printful para token)
   const code = provider.code?.toLowerCase();
-  if (code === "aliexpress" || code === "cj") {
+  if (code === "aliexpress" || code === "cj" || code === "printful") {
     const fresh = await prisma.dropshippingProvider.findUnique({
       where: { id: provider.id },
       select: {
@@ -87,6 +87,13 @@ export async function submitOrderToProvider(
   if (!provider.isActive) return { success: false, logId: "", error: "Proveedor inactivo" };
   if (!provider.apiKey?.trim() && !provider.code?.trim()) {
     return { success: false, logId: "", error: "Proveedor sin API configurada" };
+  }
+  if (code === "printful" && !(provider as { accessToken?: string | null }).accessToken?.trim()) {
+    return {
+      success: false,
+      logId: "",
+      error: "Printful: falta Access Token. Ve a Admin → Proveedores → Configurar API y pega tu Private Token en Access Token (desde https://developers.printful.com/ → Your tokens).",
+    };
   }
   if (provider.code?.toLowerCase() === "aliexpress" && !(provider as { accessToken?: string | null }).accessToken?.trim()) {
     return {
@@ -137,6 +144,23 @@ export async function submitOrderToProvider(
         success: false,
         logId: "",
         error: "Falta el ID de variante CJ en: " + names + ". Ve a Admin -> Productos, edita el producto y en cada variante rellena 'ID variante CJ (vid o SKU)' con el valor de la ficha del producto en CJDropshipping.",
+      };
+    }
+  }
+
+  // Printful exige variant_id numérico por producto (desde catálogo Printful)
+  if (code === "printful") {
+    const missing = itemsWithCjVariant.filter((i) => {
+      const v = i.providerVariantId?.trim() || i.providerProductId?.trim();
+      const n = v ? parseInt(v, 10) : NaN;
+      return !Number.isInteger(n) || n <= 0;
+    });
+    if (missing.length > 0) {
+      const names = missing.map((i) => i.variantName ? i.productName + " (" + i.variantName + ")" : i.productName).join(", ");
+      return {
+        success: false,
+        logId: "",
+        error: "Printful: falta variant_id numérico en: " + names + ". En Admin → Productos, en cada variante rellena 'ID variante' (o ID de producto) con el variant_id del catálogo Printful.",
       };
     }
   }

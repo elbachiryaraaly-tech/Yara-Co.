@@ -23,8 +23,8 @@ export async function GET(req: Request) {
       );
     }
     // Flujo code: AliExpress redirige a /api/auth/aliexpress/callback?code=...; el servidor canjea el code por token.
-    // Se intenta primero api-sg/oauth/token (openservice) y luego oauth.aliexpress.com/token.
-    const redirectUri = `https://yaraandco.vercel.app/api/auth/aliexpress/callback`;
+    // La URL de callback debe coincidir EXACTAMENTE con la configurada en la app de AliExpress Open Platform.
+    const redirectUri = `${baseUrl.replace(/\/$/, "")}/api/auth/aliexpress/callback`;
     const authUrl = getAliExpressAuthUrl({
       clientId: provider.apiKey.trim(),
       redirectUri,

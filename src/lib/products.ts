@@ -6,7 +6,14 @@ export async function getFeaturedProducts(limit = 8) {
   try {
     const products = await prisma.product.findMany({
       where: { isActive: true, isFeatured: true },
-      include: { images: { orderBy: { order: "asc" } } },
+      include: { 
+        images: { orderBy: { order: "asc" } },
+        variants: {
+          select: {
+            stock: true,
+          },
+        },
+      },
       take: limit,
       orderBy: { createdAt: "desc" },
     });
@@ -56,7 +63,14 @@ export async function getProducts(options: {
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      include: { images: { orderBy: { order: "asc" }, take: 1 } },
+      include: { 
+        images: { orderBy: { order: "asc" }, take: 1 },
+        variants: {
+          select: {
+            stock: true,
+          },
+        },
+      },
       orderBy,
       skip,
       take: limit,

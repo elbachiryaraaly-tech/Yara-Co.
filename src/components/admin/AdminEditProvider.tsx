@@ -150,8 +150,9 @@ export function AdminEditProvider({ providerId, children }: { providerId: string
                   className="bg-[var(--elevated)] border-[var(--border)]"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Usa <code className="bg-[var(--elevated)] px-1 rounded">cj</code> para CJDropshipping o{" "}
-                  <code className="bg-[var(--elevated)] px-1 rounded">aliexpress</code> para AliExpress.
+                  Usa <code className="bg-[var(--elevated)] px-1 rounded">cj</code>,{" "}
+                  <code className="bg-[var(--elevated)] px-1 rounded">aliexpress</code> o{" "}
+                  <code className="bg-[var(--elevated)] px-1 rounded">printful</code>.
                 </p>
               </div>
               <div className="space-y-2">
@@ -190,19 +191,27 @@ export function AdminEditProvider({ providerId, children }: { providerId: string
                   className="bg-[var(--elevated)] border-[var(--border)]"
                 />
               </div>
-              {form.code?.toLowerCase() === "aliexpress" && (
+              {(form.code?.toLowerCase() === "aliexpress" || form.code?.toLowerCase() === "printful") && (
                 <div className="space-y-2">
-                  <Label>Access Token (AliExpress) *</Label>
+                  <Label>
+                    Access Token {form.code?.toLowerCase() === "printful" ? "(Printful) *" : "(AliExpress) *"}
+                  </Label>
                   <Input
                     type="password"
                     autoComplete="off"
                     value={form.accessToken}
                     onChange={(e) => setForm((f) => ({ ...f, accessToken: e.target.value }))}
-                    placeholder="Token OAuth de AliExpress Open Platform"
+                    placeholder={
+                      form.code?.toLowerCase() === "printful"
+                        ? "Private Token de Printful (Developer Portal)"
+                        : "Token OAuth de AliExpress Open Platform"
+                    }
                     className="bg-[var(--elevated)] border-[var(--border)]"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Obligatorio para crear pedidos. Obtén el token en openservice.aliexpress.com (autoriza tu app y copia el access_token).
+                    {form.code?.toLowerCase() === "printful"
+                      ? "Obligatorio para Printful. Obtén tu Private Token en developers.printful.com → Your tokens y pégalo aquí."
+                      : "Obligatorio para crear pedidos. Obtén el token en openservice.aliexpress.com (autoriza tu app y copia el access_token)."}
                   </p>
                 </div>
               )}

@@ -64,6 +64,9 @@ type Product = {
   badges: string[];
   rating: { toString(): string } | number | null;
   reviewCount: number;
+  stock?: number;
+  trackInventory?: boolean;
+  variants?: { stock: number }[];
 };
 
 function toCardProduct(p: Product | (typeof FALLBACK_PRODUCTS)[0]) {
@@ -73,6 +76,10 @@ function toCardProduct(p: Product | (typeof FALLBACK_PRODUCTS)[0]) {
   const badges = "badges" in p && Array.isArray(p.badges) ? p.badges : (p as (typeof FALLBACK_PRODUCTS)[0]).badge ? [(p as (typeof FALLBACK_PRODUCTS)[0]).badge!] : [];
   const rating = p.rating != null ? Number(p.rating) : null;
   const reviewCount = p.reviewCount ?? 0;
+  const variants = "variants" in p ? p.variants : undefined;
+  const stock = "stock" in p ? (p as Product).stock : undefined;
+  const trackInventory = "trackInventory" in p ? (p as Product).trackInventory : undefined;
+  
   return {
     id: p.id,
     name: p.name,
@@ -83,6 +90,9 @@ function toCardProduct(p: Product | (typeof FALLBACK_PRODUCTS)[0]) {
     badge: badges[0],
     rating,
     reviewCount,
+    stock: stock ?? 0,
+    trackInventory: trackInventory ?? true,
+    variants,
   };
 }
 

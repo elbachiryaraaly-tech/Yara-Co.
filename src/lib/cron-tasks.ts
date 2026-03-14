@@ -121,17 +121,23 @@ export async function syncTracking(): Promise<{
   for (const order of orders) {
     try {
       const provider = order.items[0]?.product?.provider;
-      if (!provider?.apiKey || !order.providerOrderId) continue;
+      const code = provider?.code?.toLowerCase();
+      const hasAuth =
+        provider &&
+        order.providerOrderId &&
+        (provider.apiKey?.trim() ||
+          (code === "printful" && (provider as { accessToken?: string | null }).accessToken?.trim()));
+      if (!hasAuth) continue;
 
       const config = {
-        id: provider.id,
-        name: provider.name,
-        code: provider.code,
-        apiKey: provider.apiKey,
-        apiSecret: provider.apiSecret ?? null,
+        id: provider!.id,
+        name: provider!.name,
+        code: provider!.code,
+        apiKey: provider!.apiKey,
+        apiSecret: (provider as { apiSecret?: string | null }).apiSecret ?? null,
         accessToken: (provider as { accessToken?: string | null }).accessToken ?? null,
-        baseUrl: provider.baseUrl ?? null,
-        isActive: provider.isActive,
+        baseUrl: provider!.baseUrl ?? null,
+        isActive: provider!.isActive,
       };
 
       const status = await Promise.race([

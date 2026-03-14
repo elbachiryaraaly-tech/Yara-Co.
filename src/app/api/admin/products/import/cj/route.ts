@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { slugify } from "@/lib/utils";
+import { slugify, cleanHtmlDescription } from "@/lib/utils";
 import { cjAdapter } from "@/lib/dropshipping/adapters/cj";
 
 // Usaremos un truco: dado que getCachedCjToken no está exportado,
@@ -145,7 +145,10 @@ export async function POST(req: Request) {
         let minPrice: number | null = null;
         let maxPrice: number | null = null;
 
-        const parsedVariants = cjVariants.map((v: any) => {
+        // Debug: log para ver qué campos vienen en las variantes
+        console.log("CJ Variants data sample:", cjVariants.slice(0, 2));
+
+        const parsedVariants = cjVariants.map((v: any, index: number) => {
             const price = parseFloat(v.sellPrice) || parseFloat(cjData.sellPrice) || 0;
             if (minPrice === null || price < minPrice) minPrice = price;
             if (maxPrice === null || price > maxPrice) maxPrice = price;
@@ -153,13 +156,72 @@ export async function POST(req: Request) {
             // Intentar construir el nombre de variante (Talla, Color)
             let variantName = v.variantNameEn || v.variantName || v.varkey || "Estándar";
 
+            // Debug: log para ver qué campos de stock vienen en las variantes
+            console.log(`Variant ${index} stock fields:`, {
+                variantInventory: v.variantInventory,
+                inventory: v.inventory,
+                stock: v.stock,
+                lists: v.lists,
+                quantity: v.quantity,
+                availableStock: v.availableStock,
+                stockCount: v.stockCount
+            });
+
+            // Extraer el ID de variante de CJ con múltiples fallbacks
+            // Prioridad: vid > variantSku > sku > id > generar uno basado en el nombre
+            let providerVariantId: string;
+            
+            if (v.vid && typeof v.vid === 'string' && v.vid.trim()) {
+                providerVariantId = v.vid.trim();
+            } else if (v.variantSku && typeof v.variantSku === 'string' && v.variantSku.trim()) {
+                providerVariantId = v.variantSku.trim();
+            } else if (v.sku && typeof v.sku === 'string' && v.sku.trim()) {
+                providerVariantId = v.sku.trim();
+            } else if (v.id && typeof v.id === 'string' && v.id.trim()) {
+                providerVariantId = v.id.trim();
+            } else if (v.variantId && typeof v.variantId === 'string' && v.variantId.trim()) {
+                providerVariantId = v.variantId.trim();
+            } else {
+                // Último recurso: generar un ID basado en el producto y variante
+                providerVariantId = `${cjProductId}-${variantName.replace(/\s+/g, '-').toLowerCase()}`;
+            }
+
+            // Generar SKU único para esta variante
+            let uniqueSku: string;
+            const baseSku = v.variantSku || v.sku || cjData.productSku || cjProductId;
+            
+            if (baseSku && baseSku.trim()) {
+                // Si hay un SKU base, añadir sufijo si hay múltiples variantes
+                if (cjVariants.length > 1) {
+                    uniqueSku = `${baseSku.trim()}-${index + 1}`;
+                } else {
+                    uniqueSku = baseSku.trim();
+                }
+            } else {
+                // Si no hay SKU base, generar uno único
+                uniqueSku = `${cjProductId}-VAR${index + 1}`;
+            }
+
+            // Extraer stock con múltiples fallbacks incluyendo 'lists'
+            const stockValue = parseInt(v.variantInventory) || 
+                              parseInt(v.inventory) || 
+                              parseInt(v.stock) || 
+                              parseInt(v.lists) ||  // <-- Añadido: CJ usa 'lists' para stock
+                              parseInt(v.quantity) || 
+                              parseInt(v.availableStock) || 
+                              parseInt(v.stockCount) || 
+                              10; // fallback
+
+            // Debug: log para ver qué ID se asigna
+            console.log(`Variant "${variantName}" -> providerVariantId: "${providerVariantId}" (source: ${v.vid ? 'vid' : v.variantSku ? 'variantSku' : v.sku ? 'sku' : v.id ? 'id' : v.variantId ? 'variantId' : 'generated'}), SKU: "${uniqueSku}", STOCK: ${stockValue}`);
+
             return {
                 name: variantName,
-                sku: v.variantSku || "",
-                providerVariantId: v.vid || v.variantSku, // VID de CJ (UUID) es preferible
+                sku: uniqueSku, // SKU único garantizado
+                providerVariantId: providerVariantId, // Aseguramos que siempre tenga un valor
                 price: price * 2.0, // PRECIO SUGERIDO: 100% de margen base como partida
                 compareAtPrice: price * 3.0, // Precio tachado de partida
-                stock: parseInt(v.variantInventory) || 0,
+                stock: stockValue,
                 imageUrl: v.variantImage || null,
                 options: v.variantKey ? { property: v.variantKey } : {},
             };
@@ -174,7 +236,7 @@ export async function POST(req: Request) {
             data: {
                 name,
                 slug,
-                description: cjData.description || `Importado de CJ Dropshipping (ID: ${cjProductId})`,
+                description: cleanHtmlDescription(cjData.description) || `Importado de CJ Dropshipping (ID: ${cjProductId})`,
                 shortDescription: cjData.productType || "CJ Product",
                 price: basePrice,
                 compareAtPrice: baseCompare,
@@ -207,7 +269,7 @@ export async function POST(req: Request) {
                 data: parsedVariants.map((v: any) => ({
                     productId: product.id,
                     name: v.name,
-                    sku: v.sku || null,
+                    sku: v.sku, // Ahora siempre tiene un valor único
                     providerVariantId: v.providerVariantId, // IMPORTANTE
                     price: v.price,
                     compareAtPrice: v.compareAtPrice,

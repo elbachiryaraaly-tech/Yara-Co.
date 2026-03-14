@@ -82,6 +82,19 @@ async function main() {
       },
     });
   }
+  // Printful: Private Token en Admin → Proveedores → Configurar API → Access Token (o PRINTFUL_ACCESS_TOKEN en .env)
+  const printfulToken = process.env.PRINTFUL_ACCESS_TOKEN?.trim() || undefined;
+  const printful = await prisma.dropshippingProvider.findFirst({ where: { code: "printful" } });
+  if (printful) {
+    await prisma.dropshippingProvider.update({
+      where: { id: printful.id },
+      data: { name: "Printful", code: "printful", accessToken: printfulToken ?? printful.accessToken, isActive: true },
+    });
+  } else {
+    await prisma.dropshippingProvider.create({
+      data: { name: "Printful", code: "printful", accessToken: printfulToken, isActive: true },
+    });
+  }
   // Resto de proveedores si no existen
   const names = ["Proveedor demo"];
   for (const name of names) {

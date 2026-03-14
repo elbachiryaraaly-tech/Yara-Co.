@@ -102,12 +102,12 @@ export default async function AdminProveedoresPage({
                     <div>
                       <h3 className="font-semibold text-[var(--foreground)]">{p.name}</h3>
                       <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                        {p.apiKey ? (
+                        {p.apiKey || (p.code?.toLowerCase() === "printful" && (p as { accessToken?: string | null }).accessToken?.trim()) ? (
                           <>
                             <Key className="h-3.5 w-3 text-emerald-400" />
                             API conectada
                             {(p as { accessToken?: string | null }).accessToken &&
-                             p.code?.toLowerCase() === "aliexpress" && (
+                             (p.code?.toLowerCase() === "aliexpress" || p.code?.toLowerCase() === "printful") && (
                               <> · <span className="text-emerald-400">Token OK</span></>
                             )}
                           </>
@@ -169,6 +169,20 @@ export default async function AdminProveedoresPage({
                         Mi CJ → API Key
                       </a>
                       .
+                    </p>
+                  )}
+                  {p.code?.toLowerCase() === "printful" && !(p as { accessToken?: string | null }).accessToken?.trim() && (
+                    <p className="text-[10px] text-muted-foreground w-full mb-1">
+                      Printful usa <strong>Access Token</strong> (Private Token). Obténlo en{" "}
+                      <a
+                        href="https://developers.printful.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--gold)] hover:underline"
+                      >
+                        developers.printful.com → Your tokens
+                      </a>
+                      y pégalo en Configurar API → Access Token.
                     </p>
                   )}
                   <AdminEditProvider providerId={p.id}>

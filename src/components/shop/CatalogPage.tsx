@@ -26,6 +26,9 @@ type Product = {
   badges: string[];
   rating: { toString(): string } | null;
   reviewCount: number;
+   stock: number;
+   trackInventory?: boolean;
+  variants?: { stock: number }[];
 };
 
 export function CatalogPage({
@@ -176,6 +179,9 @@ export function CatalogPage({
                     badge={product.badges?.[0]}
                     rating={product.rating ? Number(product.rating) : null}
                     reviewCount={product.reviewCount}
+                    stock={product.stock}
+                    trackInventory={product.trackInventory ?? true}
+                    variants={product.variants}
                   />
                 ))}
               </div>

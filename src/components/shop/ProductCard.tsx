@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { AlertCircle, Package } from "lucide-react";
 import { formatPrice, cn, getImageUrl } from "@/lib/utils";
 
 export interface ProductCardProps {
@@ -20,6 +21,11 @@ export interface ProductCardProps {
   className?: string;
   /** Si true, la card es más grande (destacada) */
   featured?: boolean;
+  /** Stock information */
+  stock?: number;
+  variants?: Array<{ stock: number }>;
+  /** Si es false, no se muestra "Agotado" aunque el stock sea 0 (ej. productos gestionados por CJ) */
+  trackInventory?: boolean;
 }
 
 export function ProductCard({
@@ -33,11 +39,27 @@ export function ProductCard({
   reviewCount = 0,
   className,
   featured = false,
+  stock,
+  variants,
+  trackInventory = true,
 }: ProductCardProps) {
   const [hover, setHover] = React.useState(false);
   const discount = compareAtPrice
     ? Math.round(((Number(compareAtPrice) - price) / Number(compareAtPrice)) * 100)
     : 0;
+
+  // Calculate stock status
+  const totalStock = React.useMemo(() => {
+    if (!trackInventory) return Number.POSITIVE_INFINITY;
+    if (stock !== undefined) return stock;
+    if (variants) {
+      return variants.reduce((total, variant) => total + Math.max(0, variant.stock), 0);
+    }
+    return 0;
+  }, [stock, variants, trackInventory]);
+
+  const isOutOfStock = trackInventory && totalStock <= 0;
+  const isLowStock = trackInventory && totalStock > 0 && totalStock <= 5;
 
   return (
     <motion.article
@@ -67,7 +89,8 @@ export function ProductCard({
             fill
             className={cn(
               "object-cover transition-all duration-1000 ease-out",
-              hover ? "scale-110 brightness-110" : "scale-100 brightness-100"
+              hover ? "scale-110 brightness-110" : "scale-100 brightness-100",
+              isOutOfStock && "grayscale opacity-75"
             )}
             sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"}
           />
@@ -77,9 +100,48 @@ export function ProductCard({
               "absolute inset-0 transition-all duration-700",
               hover
                 ? "bg-gradient-to-t from-[var(--ink)]/60 via-[var(--ink)]/20 to-transparent"
-                : "bg-gradient-to-t from-[var(--ink)]/30 via-transparent to-transparent"
+                : "bg-gradient-to-t from-[var(--ink)]/30 via-transparent to-transparent",
+              isOutOfStock && "bg-black/40"
             )}
           />
+          {/* Out of stock overlay */}
+          {isOutOfStock && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-black/60 z-20 flex items-center justify-center"
+            >
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-2"
+                >
+                  <AlertCircle className="h-6 w-6 text-white" />
+                </motion.div>
+                <motion.span
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-white font-bold text-sm uppercase tracking-wider"
+                >
+                  Agotado
+                </motion.span>
+              </div>
+            </motion.div>
+          )}
+          {/* Low stock indicator */}
+          {!isOutOfStock && isLowStock && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute top-4 right-4 bg-amber-500 text-white px-2 py-1 rounded-lg text-xs font-medium z-10 flex items-center gap-1"
+            >
+              <Package className="h-3 w-3" />
+              ¡Últimas {totalStock}!
+            </motion.div>
+          )}
           {/* Efecto de brillo en hover */}
           <motion.div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
@@ -104,7 +166,7 @@ export function ProductCard({
                 {badge}
               </motion.span>
             )}
-            {discount > 0 && (
+            {discount > 0 && !isOutOfStock && (
               <motion.span
                 initial={{ scale: 0, rotate: -180 }}
                 whileInView={{ scale: 1, rotate: 0 }}
@@ -155,14 +217,22 @@ export function ProductCard({
           </h3>
           <div className="flex items-baseline gap-3">
             <motion.span
-              className="text-sm lg:text-base font-bold text-[var(--gold)]"
-              whileHover={{ scale: 1.05 }}
+              className={cn(
+                "text-sm lg:text-base font-bold",
+                isOutOfStock ? "text-gray-400 line-through" : "text-[var(--gold)]"
+              )}
+              whileHover={!isOutOfStock ? { scale: 1.05 } : {}}
             >
               {formatPrice(price)}
             </motion.span>
-            {compareAtPrice && (
+            {compareAtPrice && !isOutOfStock && (
               <span className="text-xs text-muted-foreground line-through opacity-60">
                 {formatPrice(Number(compareAtPrice))}
+              </span>
+            )}
+            {isOutOfStock && (
+              <span className="text-xs text-red-400 font-medium">
+                Agotado
               </span>
             )}
           </div>
