@@ -109,7 +109,7 @@ export async function POST(req: Request) {
     const MARGIN = 2.0;
     let minPrice: number | null = null;
     const parsedVariants = pfVariants.map((v: { id: number; name?: string; size?: string; color?: string; price?: string; image?: string }, index: number) => {
-      const price = parseFloat(v.price) || 0;
+      const price = parseFloat(v.price ?? "") || 0;
       if (minPrice === null || price < minPrice) minPrice = price;
       const variantName = [v.size, v.color].filter(Boolean).join(" / ") || v.name || `Variante ${index + 1}`;
       const variantImage = printfulImageUrl(pfProduct.id, v.image);
