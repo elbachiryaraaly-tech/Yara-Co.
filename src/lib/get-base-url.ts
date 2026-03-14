@@ -27,9 +27,15 @@ export function ensureHttpForLocalhost(url: string): string {
 
 /** URL base para redirects y Stripe: prioriza SITE_URL, luego NEXTAUTH_URL, y fuerza http en localhost. */
 export function getAppBaseUrl(): string {
-  const raw =
-    process.env.SITE_URL?.trim() ||
-    process.env.NEXTAUTH_URL?.trim() ||
-    "http://localhost:3000";
-  return ensureHttpForLocalhost(raw);
+  // For production, return the new Vercel domain
+  if (process.env.NODE_ENV === "production") {
+    return "https://yaraandco.vercel.app";
+  }
+
+  // For development, try environment variable or localhost fallback
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  return "http://localhost:3000";
 }
