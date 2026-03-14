@@ -140,6 +140,9 @@ export default async function AdminProveedoresPage({
                           {getAppBaseUrl()}/api/auth/aliexpress/authorize
                         </code>
                       </p>
+                      <p className="text-[11px] text-amber-200/90 bg-amber-500/15 border border-amber-500/30 rounded-lg p-2 w-full mt-1">
+                        Si <strong>solo aparece &quot;Buyer login&quot;</strong> y no hay opción de vendedor: tu app en AliExpress puede ser tipo Affiliate/Buyer. Entra en <strong>openservice.aliexpress.com</strong> → crea una <strong>nueva app</strong> bajo <strong>Overseas Developers → Seller Authorization / Dropshipper</strong>, configura la Callback URL y usa la nueva App Key y App Secret aquí en Configurar API.
+                      </p>
                     </>
                   )}
                   {p.code?.toLowerCase() === "cj" && !p.apiKey?.trim() && (

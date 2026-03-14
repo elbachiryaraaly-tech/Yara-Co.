@@ -27,6 +27,8 @@ export function getAliExpressAuthUrl(params: {
   url.searchParams.set("sp", "ae");
   url.searchParams.set("redirect_auth", "true");
   if (!params.tokenInUrl) url.searchParams.set("force_auth", "true");
+  // Forzar pantalla de vendedor (seller). Sin esto a veces solo aparece "Buyer login".
+  url.searchParams.set("account_platform", "seller_center");
   if (params.state) url.searchParams.set("state", params.state);
   return url.toString();
 }
