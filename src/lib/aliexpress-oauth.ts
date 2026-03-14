@@ -104,17 +104,19 @@ async function exchangeCodeViaDropShipRest(params: {
 }): Promise<{ success: true; data: AliExpressTokenResponse } | { success: false; error: string }> {
   const crypto = await import("crypto");
   let lastRestError = "Unknown error";
-  const variants: { methodKey: string; timestamp: string }[] = [
-    { methodKey: "method", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14) },
-    { methodKey: "api_name", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14) },
-    { methodKey: "method", timestamp: timestampGmt8() },
-    { methodKey: "api_name", timestamp: timestampGmt8() },
+  const variants: { methodKey: string; timestamp: string; appKeyParam: "app_key" | "appkey" }[] = [
+    { methodKey: "method", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key" },
+    { methodKey: "api_name", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key" },
+    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "app_key" },
+    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "app_key" },
+    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "appkey" },
+    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "appkey" },
   ];
 
-  for (const { methodKey, timestamp } of variants) {
+  for (const { methodKey, timestamp, appKeyParam } of variants) {
     const payload: Record<string, string> = {
       [methodKey]: "/auth/token/create",
-      app_key: params.clientId,
+      [appKeyParam]: params.clientId,
       code: params.code,
       redirect_uri: params.redirectUri,
       sign_method: "hmac-sha256",
