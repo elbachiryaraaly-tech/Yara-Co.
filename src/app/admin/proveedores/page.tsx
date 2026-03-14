@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Truck, Key, Check, X, Link2, AlertCircle } from "lucide-react";
 
-type SearchParams = Promise<{ aliexpress?: string; error?: string; message?: string }>;
+type SearchParams = Promise<{ aliexpress?: string; error?: string; message?: string; key_hint?: string }>;
 const decode = (s: string | undefined) => (s ? decodeURIComponent(s) : "");
 
 export default async function AdminProveedoresPage({
@@ -48,6 +48,11 @@ export default async function AdminProveedoresPage({
           {params.message && (
             <p className="text-xs font-mono bg-black/20 rounded px-2 py-1 break-all">
               Error de AliExpress: {decode(params.message)}
+            </p>
+          )}
+          {params.key_hint && (
+            <p className="text-xs bg-[var(--elevated)] rounded px-2 py-1">
+              App Key que está usando el sistema: <strong>{decode(params.key_hint)}</strong> (ej. 52**86 = 529586). Si no es la que configuraste, entra en <strong>Configurar API</strong>, escribe de nuevo la App Key y el App Secret y guarda.
             </p>
           )}
           <p className="text-muted-foreground text-xs">

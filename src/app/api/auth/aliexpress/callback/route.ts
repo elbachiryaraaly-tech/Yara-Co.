@@ -45,7 +45,9 @@ export async function GET(req: Request) {
     if (!result.success) {
       console.error("[AliExpress callback] exchangeCodeForToken failed:", result.error);
       const msg = encodeURIComponent(result.error);
-      const q = "error=aliexpress_manual_token&message=" + msg;
+      const key = provider.apiKey.trim();
+      const keyHint = key.length >= 4 ? key.slice(0, 2) + "**" + key.slice(-2) : "****";
+      const q = "error=aliexpress_manual_token&message=" + msg + "&key_hint=" + encodeURIComponent(keyHint);
       return NextResponse.redirect(new URL(`/admin/proveedores?${q}`, baseUrl));
     }
     await prisma.dropshippingProvider.update({
