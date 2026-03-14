@@ -5,7 +5,6 @@ import { getAdminProviders } from "@/lib/admin";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Truck, Key, Check, X, Link2, AlertCircle } from "lucide-react";
-import Link from "next/link";
 
 type SearchParams = Promise<{ aliexpress?: string; error?: string; message?: string }>;
 
@@ -121,10 +120,10 @@ export default async function AdminProveedoresPage({
                   {p.code?.toLowerCase() === "aliexpress" && p.apiKey?.trim() && (
                     <>
                       <Button variant="outline" size="sm" className="border-[var(--border)] gap-1.5" asChild>
-                        <Link href="/api/auth/aliexpress/authorize">
+                        <a href="/api/auth/aliexpress/authorize" className="inline-flex items-center">
                           <Link2 className="h-3.5 w-3" />
                           {(p as { accessToken?: string | null }).accessToken ? "Renovar token" : "Conectar con AliExpress"}
-                        </Link>
+                        </a>
                       </Button>
                       <p className="text-[10px] text-muted-foreground w-full mt-1">
                         Callback URL en la app AliExpress: <code className="bg-[var(--elevated)] px-1 rounded">/api/auth/aliexpress/callback</code>
