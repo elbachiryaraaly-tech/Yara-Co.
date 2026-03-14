@@ -35,7 +35,7 @@ export async function GET(req: Request) {
         new URL("/admin/proveedores?error=aliexpress_no_credentials", baseUrl)
       );
     }
-    const redirectUri = `${baseUrl}/api/auth/aliexpress/callback`;
+    const redirectUri = `${baseUrl.replace(/\/$/, "")}/api/auth/aliexpress/callback`;
     const result = await exchangeCodeForToken({
       code,
       clientId: provider.apiKey.trim(),
@@ -44,10 +44,8 @@ export async function GET(req: Request) {
     });
     if (!result.success) {
       console.error("[AliExpress callback] exchangeCodeForToken failed:", result.error);
-      const isAppkeyError = /appkey|app_key|param-appkey/i.test(result.error);
-      const q = isAppkeyError
-        ? "error=aliexpress_manual_token"
-        : "error=aliexpress_token&message=" + encodeURIComponent(result.error);
+      const msg = encodeURIComponent(result.error);
+      const q = "error=aliexpress_manual_token&message=" + msg;
       return NextResponse.redirect(new URL(`/admin/proveedores?${q}`, baseUrl));
     }
     await prisma.dropshippingProvider.update({

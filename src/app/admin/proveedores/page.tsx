@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Truck, Key, Check, X, Link2, AlertCircle } from "lucide-react";
 
 type SearchParams = Promise<{ aliexpress?: string; error?: string; message?: string }>;
+const decode = (s: string | undefined) => (s ? decodeURIComponent(s) : "");
 
 export default async function AdminProveedoresPage({
   searchParams,
@@ -43,16 +44,19 @@ export default async function AdminProveedoresPage({
       )}
       {params.error === "aliexpress_manual_token" && (
         <div className="rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 px-4 py-3 text-sm space-y-2">
-          <p className="font-medium">Configura el token de AliExpress manualmente</p>
+          <p className="font-medium">No se pudo obtener el token automáticamente</p>
+          {params.message && (
+            <p className="text-xs font-mono bg-black/20 rounded px-2 py-1 break-all">
+              Error de AliExpress: {decode(params.message)}
+            </p>
+          )}
           <p className="text-muted-foreground text-xs">
-            Con apps de openservice.aliexpress.com el token no se obtiene desde aquí. Sigue estos pasos y luego pulsa <strong>Configurar API</strong> en la tarjeta de AliExpress para pegar el token.
+            Opción 1: Con apps de openservice.aliexpress.com puedes intentar obtener el token manualmente. Entra en tu app → Auth Management o Documentation → &quot;Get token&quot; / &quot;Obtain token&quot; → copia el <strong>access_token</strong> y pégalo aquí en <strong>Configurar API</strong> → Access Token.
           </p>
-          <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-            <li>Entra en <strong>openservice.aliexpress.com</strong> → tu app → Auth Management o Documentation.</li>
-            <li>Usa la opción &quot;Get token&quot; / &quot;Obtain token&quot; y copia el <strong>access_token</strong>.</li>
-            <li>Aquí: <strong>Configurar API</strong> en la tarjeta de AliExpress → pega en <strong>Access Token</strong> → Guarda.</li>
-          </ol>
-          <p className="text-muted-foreground text-xs mt-2">El token puede caducar (p. ej. 30 días); cuando la API lo pida, repite el proceso o usa &quot;Renovar token&quot; si está disponible.</p>
+          <p className="text-muted-foreground text-xs">
+            Opción 2: Si el error anterior habla de &quot;code&quot; o &quot;expired&quot;, vuelve a pulsar <strong>Conectar con AliExpress</strong> e inicia sesión y autoriza de nuevo (el código caduca en unos minutos).
+          </p>
+          <p className="text-muted-foreground text-xs mt-2">El token puede caducar (p. ej. 30 días); cuando la API lo pida, repite el proceso o usa &quot;Renovar token&quot;.</p>
         </div>
       )}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
