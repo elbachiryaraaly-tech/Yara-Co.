@@ -6,6 +6,7 @@
 // Authorize en api-sg (openservice). Token: DropShip API usa /rest + /auth/token/create
 const ALIEXPRESS_AUTHORIZE_URL = "https://api-sg.aliexpress.com/oauth/authorize";
 const ALIEXPRESS_REST_BASE = "https://api-sg.aliexpress.com/rest";
+const ALIEXPRESS_SYNC_BASE = "https://api-sg.aliexpress.com/sync";
 const ALIEXPRESS_TOKEN_CREATE_GET = "https://api-sg.aliexpress.com/rest/auth/token/create";
 const ALIEXPRESS_TOKEN_URLS = [
   "https://api-sg.aliexpress.com/oauth/token",
@@ -163,16 +164,19 @@ async function exchangeCodeViaDropShipRest(params: {
 }): Promise<{ success: true; data: AliExpressTokenResponse } | { success: false; error: string }> {
   const crypto = await import("crypto");
   let lastRestError = "Unknown error";
-  const variants: { methodKey: string; timestamp: string; appKeyParam: "app_key" | "appkey" }[] = [
-    { methodKey: "method", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key" },
-    { methodKey: "api_name", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key" },
-    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "app_key" },
-    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "app_key" },
-    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "appkey" },
-    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "appkey" },
+  const variants: { methodKey: string; timestamp: string; appKeyParam: "app_key" | "appkey"; signWrap: boolean }[] = [
+    { methodKey: "method", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key", signWrap: false },
+    { methodKey: "api_name", timestamp: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14), appKeyParam: "app_key", signWrap: false },
+    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "app_key", signWrap: false },
+    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "app_key", signWrap: false },
+    { methodKey: "method", timestamp: String(Date.now()), appKeyParam: "app_key", signWrap: false },
+    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "app_key", signWrap: true },
+    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "app_key", signWrap: true },
+    { methodKey: "method", timestamp: timestampGmt8(), appKeyParam: "appkey", signWrap: false },
+    { methodKey: "api_name", timestamp: timestampGmt8(), appKeyParam: "appkey", signWrap: false },
   ];
 
-  for (const { methodKey, timestamp, appKeyParam } of variants) {
+  for (const { methodKey, timestamp, appKeyParam, signWrap } of variants) {
     const payload: Record<string, string> = {
       [methodKey]: "/auth/token/create",
       [appKeyParam]: params.clientId,
@@ -182,45 +186,50 @@ async function exchangeCodeViaDropShipRest(params: {
       timestamp,
     };
     const sortedKeys = Object.keys(payload).sort();
-    const signStr = sortedKeys.map((k) => `${k}${payload[k]}`).join("");
+    const concat = sortedKeys.map((k) => `${k}${payload[k]}`).join("");
+    const signStr = signWrap
+      ? params.clientSecret + concat + params.clientSecret
+      : concat;
     payload.sign = crypto.createHmac("sha256", params.clientSecret).update(signStr).digest("hex").toUpperCase();
 
-    const res = await fetch(ALIEXPRESS_REST_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
-      body: new URLSearchParams(payload).toString(),
-    });
-    const text = await res.text();
-    let json: Record<string, unknown>;
-    try {
-      json = JSON.parse(text);
-    } catch {
-      continue;
+    for (const base of [ALIEXPRESS_REST_BASE, ALIEXPRESS_SYNC_BASE]) {
+      const res = await fetch(base, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+        body: new URLSearchParams(payload).toString(),
+      });
+      const text = await res.text();
+      let json: Record<string, unknown>;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        continue;
+      }
+      const errCode = (json.gopErrorCode as string) ?? (json.code as string);
+      const errMsg = (json.gopErrorMsg as string) ?? (json.msg as string) ?? (json.message as string) ?? String(errCode || "Unknown");
+      if (errCode && String(errCode) !== "0") {
+        lastRestError = `[${errCode}] ${errMsg}`;
+        continue;
+      }
+      const bodyStr = (json.gopResponseBody as string) ?? text;
+      let body: Record<string, unknown>;
+      try {
+        body = typeof bodyStr === "string" ? (JSON.parse(bodyStr) as Record<string, unknown>) : (bodyStr as Record<string, unknown>);
+      } catch {
+        body = json;
+      }
+      const access_token = (body.access_token as string) ?? (json.access_token as string);
+      if (!access_token) continue;
+      return {
+        success: true,
+        data: {
+          access_token,
+          refresh_token: (body.refresh_token as string) ?? (json.refresh_token as string),
+          expire_time: (body.expire_time as string) ?? (json.expire_time as string),
+          refresh_token_valid_time: (body.refresh_token_valid_time as string) ?? (json.refresh_token_valid_time as string),
+        },
+      };
     }
-    const errCode = (json.gopErrorCode as string) ?? (json.code as string);
-    const errMsg = (json.gopErrorMsg as string) ?? (json.msg as string) ?? (json.message as string) ?? String(errCode || "Unknown");
-    if (errCode && String(errCode) !== "0") {
-      lastRestError = `[${errCode}] ${errMsg}`;
-      continue;
-    }
-    const bodyStr = (json.gopResponseBody as string) ?? text;
-    let body: Record<string, unknown>;
-    try {
-      body = typeof bodyStr === "string" ? (JSON.parse(bodyStr) as Record<string, unknown>) : (bodyStr as Record<string, unknown>);
-    } catch {
-      body = json;
-    }
-    const access_token = (body.access_token as string) ?? (json.access_token as string);
-    if (!access_token) continue;
-    return {
-      success: true,
-      data: {
-        access_token,
-        refresh_token: (body.refresh_token as string) ?? (json.refresh_token as string),
-        expire_time: (body.expire_time as string) ?? (json.expire_time as string),
-        refresh_token_valid_time: (body.refresh_token_valid_time as string) ?? (json.refresh_token_valid_time as string),
-      },
-    };
   }
 
   return { success: false, error: lastRestError };
