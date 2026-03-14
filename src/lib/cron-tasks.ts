@@ -129,6 +129,9 @@ export async function syncTracking(): Promise<{
           (code === "printful" && (provider as { accessToken?: string | null }).accessToken?.trim()));
       if (!hasAuth) continue;
 
+      const providerOrderId = order.providerOrderId;
+      if (!providerOrderId) continue;
+
       const config = {
         id: provider!.id,
         name: provider!.name,
@@ -141,7 +144,7 @@ export async function syncTracking(): Promise<{
       };
 
       const status = await Promise.race([
-        getOrderStatus(config, order.providerOrderId),
+        getOrderStatus(config, providerOrderId),
         new Promise<undefined>((_, reject) =>
           setTimeout(() => reject(new Error("Timeout 15s")), TRACKING_TIMEOUT_MS)
         ),
