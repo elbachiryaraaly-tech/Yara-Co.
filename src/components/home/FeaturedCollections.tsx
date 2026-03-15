@@ -16,23 +16,26 @@ type Collection = { href: string; title: string; subtitle: string; image: string
 export function FeaturedCollections({ collections = DEFAULT_COLLECTIONS }: { collections?: Collection[] }) {
   const list = collections.length > 0 ? collections : DEFAULT_COLLECTIONS;
   return (
-    <section className="py-24 lg:py-32 border-t border-[var(--border)]">
+    <section className="py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-[var(--elevated)]">
       <div className="container mx-auto px-6 lg:px-12">
         <motion.div
-          className="mb-16 lg:mb-24"
+          className="mb-16 lg:mb-24 flex flex-col"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <p className="text-[var(--gold)] text-sm uppercase tracking-[0.2em] mb-3">
-            Categorías
-          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="h-px w-12 bg-[var(--gold)]/80" />
+            <p className="text-[var(--gold)] text-sm uppercase tracking-[0.25em] font-medium">
+              Categorías
+            </p>
+          </div>
           <h2 className="font-display text-display-sm text-[var(--foreground)] tracking-tighter">
             Colecciones
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--gold)]/10">
           {list.map((col, i) => (
             <motion.div
               key={col.href}
@@ -49,7 +52,7 @@ export function FeaturedCollections({ collections = DEFAULT_COLLECTIONS }: { col
                   src={col.image}
                   alt={col.title}
                   fill
-                  className="object-cover transition-transform duration-800 ease-out group-hover:scale-110"
+                  className="object-cover transition-transform duration-700 ease-[0.22,0.5,0.38,0.98] group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)]/95 via-[var(--ink)]/30 to-transparent transition-opacity duration-500 group-hover:from-[var(--ink)]/90" />

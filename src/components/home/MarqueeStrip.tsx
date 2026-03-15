@@ -21,7 +21,7 @@ function StripSegment({ reverse = false }: { reverse?: boolean }) {
       {words.map((word, i) => (
         <motion.span
           key={`${word}-${i}`}
-          className="font-display text-2xl lg:text-4xl font-bold text-[var(--foreground)]/15 hover:text-[var(--gold)]/30 uppercase tracking-widest whitespace-nowrap transition-colors duration-300"
+          className="font-display text-2xl lg:text-4xl font-bold text-[var(--foreground)]/12 hover:text-[var(--gold)]/40 uppercase tracking-[0.2em] whitespace-nowrap transition-colors duration-400"
           whileHover={{ scale: 1.1, color: "var(--gold)" }}
         >
           {word}
@@ -33,10 +33,10 @@ function StripSegment({ reverse = false }: { reverse?: boolean }) {
 
 export function MarqueeStrip() {
   return (
-    <section className="relative border-y border-[var(--border)] py-8 lg:py-10 overflow-hidden bg-gradient-to-r from-[var(--ink)] via-[var(--card)] to-[var(--ink)]">
-      {/* Efecto de fade en los bordes */}
-      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[var(--ink)] to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[var(--ink)] to-transparent z-10 pointer-events-none" />
+    <section className="relative border-y border-[var(--gold)]/10 py-8 lg:py-10 overflow-hidden bg-[var(--ink)]">
+      {/* Fade en bordes para continuidad con hero */}
+      <div className="absolute inset-y-0 left-0 w-24 lg:w-32 bg-gradient-to-r from-[var(--ink)] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-24 lg:w-32 bg-gradient-to-l from-[var(--ink)] to-transparent z-10 pointer-events-none" />
       
       <div className="flex w-max">
         <motion.div

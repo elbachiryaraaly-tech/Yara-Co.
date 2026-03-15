@@ -12,16 +12,16 @@ const pillars = [
 
 export function WhyYaraCo() {
   return (
-    <section className="relative py-24 lg:py-32 border-t border-[var(--border)] bg-gradient-to-b from-[var(--card)] to-[var(--ink)] overflow-hidden">
-      {/* Efectos de fondo decorativos */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-[var(--gold)]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-[var(--gold)]/10 rounded-full blur-3xl" />
+    <section className="relative py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-gradient-to-b from-[var(--elevated)] to-[var(--ink)] overflow-hidden">
+      {/* Orbes sutiles (como hero) */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-[var(--gold)]/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-[var(--gold)]/8 rounded-full blur-3xl" />
       </div>
       
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--border)]"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[var(--gold)]/10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -96,9 +96,9 @@ export function WhyYaraCo() {
                 {item.desc}
               </p>
               
-              {/* Línea decorativa inferior */}
+              {/* Línea decorativa (hero style) */}
               <motion.div
-                className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--gold)]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--gold)]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               />
             </motion.div>
           ))}

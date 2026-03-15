@@ -51,12 +51,12 @@ function AnimatedNumber({
 
 export function StatsBar() {
   return (
-    <section className="relative border-y border-[var(--border)] bg-gradient-to-b from-[var(--card)] to-[var(--ink)] py-16 lg:py-20 overflow-hidden">
-      {/* Efecto de fondo sutil */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/20 to-transparent" />
-        <div className="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/20 to-transparent" />
-        <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/20 to-transparent" />
+    <section className="relative border-y border-[var(--gold)]/10 bg-[var(--ink)] py-16 lg:py-20 overflow-hidden">
+      {/* Líneas verticales sutiles (mismo lenguaje que hero) */}
+      <div className="absolute inset-0 opacity-40">
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/15 to-transparent" />
+        <div className="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/15 to-transparent" />
+        <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-[var(--gold)]/15 to-transparent" />
       </div>
       
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -96,7 +96,7 @@ export function StatsBar() {
                   />
                 </p>
                 <motion.p 
-                  className="mt-2 text-xs text-muted-foreground uppercase tracking-wider font-medium"
+                  className="mt-2 text-xs text-[var(--foreground)]/55 uppercase tracking-[0.18em] font-medium"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}

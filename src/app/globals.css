@@ -4,14 +4,14 @@
 
 @layer base {
   :root {
-    /* Champagne & Noir: negro cálido + champagne como acento */
+    /* Champagne & Noir: negro cálido + champagne como acento (acorde a hero/slides) */
     --ink: #080808;
     --paper: #f5f2eb;
     --gold: #b8a88a;
     --gold-soft: #ddd4c4;
     --gold-deep: #8b7b5c;
     --muted: oklch(0.97 0 0);
-    --border: oklch(0.922 0 0);
+    --border: rgba(184, 168, 138, 0.12);
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -102,12 +102,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: rgba(184, 168, 138, 0.25);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--muted);
+    background: rgba(184, 168, 138, 0.4);
   }
 
   .dark {

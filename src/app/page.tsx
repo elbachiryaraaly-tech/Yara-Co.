@@ -19,14 +19,14 @@ export default async function HomePage({
   return (
     <>
       {showAdminForbidden && (
-        <div className="sticky top-0 z-50 bg-amber-500/20 border-b border-amber-500/40 text-amber-100 px-4 py-3 flex items-center justify-center gap-4 flex-wrap text-center text-sm">
+        <div className="sticky top-0 z-50 bg-[var(--ink)] border-b border-[var(--gold)]/20 text-[var(--paper)]/90 px-4 py-3 flex items-center justify-center gap-4 flex-wrap text-center text-sm">
           <span>
             No tienes permiso para acceder al panel de administración. Inicia sesión con la cuenta
             de administrador.
           </span>
           <Link
             href="/login?callbackUrl=/admin"
-            className="font-medium text-[var(--gold)] hover:underline whitespace-nowrap"
+            className="font-medium text-[var(--gold)] hover:text-[var(--gold-soft)] transition-colors whitespace-nowrap"
           >
             Iniciar sesión como admin →
           </Link>

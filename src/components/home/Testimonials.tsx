@@ -19,11 +19,11 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="relative py-24 lg:py-32 border-t border-[var(--border)] bg-gradient-to-b from-[var(--ink)] to-[var(--card)] overflow-hidden">
-      {/* Efectos de fondo decorativos */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[var(--gold)]/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[var(--gold)]/20 rounded-full blur-3xl" />
+    <section className="relative py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-gradient-to-b from-[var(--ink)] to-[var(--elevated)] overflow-hidden">
+      {/* Ambiente sutil (continuidad hero) */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[var(--gold)]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[var(--gold)]/10 rounded-full blur-3xl" />
       </div>
       
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
@@ -63,7 +63,7 @@ export function Testimonials() {
           {testimonials.map((t, i) => (
             <motion.blockquote
               key={t.author}
-              className="group relative border-l-2 border-[var(--gold)]/30 hover:border-[var(--gold)] pl-8 pr-4 py-4 transition-all duration-500 hover:bg-[var(--card)]/50 rounded-r-lg"
+              className="group relative border-l-2 border-[var(--gold)]/25 hover:border-[var(--gold)]/70 pl-8 pr-4 py-4 transition-all duration-500 hover:bg-[var(--ink)]/40 rounded-r-sm"
               initial={{ opacity: 0, y: 30, x: -20 }}
               whileInView={{ opacity: 1, y: 0, x: 0 }}
               viewport={{ once: true }}
