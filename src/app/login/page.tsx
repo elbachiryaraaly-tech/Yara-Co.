@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 
 export default function LoginPage() {
   return (
@@ -40,10 +41,11 @@ export default function LoginPage() {
       {/* Formulario */}
       <main className="w-full lg:w-[50%] xl:w-[45%] flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="lg:hidden mb-8">
+          <div className="lg:hidden mb-8 flex flex-col gap-4">
+            <Logo href="/" variant="header" className="block w-fit" />
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[var(--gold)] transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[var(--gold)] transition-colors w-fit"
             >
               <ArrowLeft className="h-4 w-4" />
               Volver

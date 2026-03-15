@@ -13,7 +13,15 @@ const PAPER = "#f5f2eb";
 const MUTED = "#8a8580";
 const BORDER = "1px solid rgba(184, 168, 138, 0.25)";
 
+/** URL base del sitio para enlaces e imágenes en emails (logo). */
+function getEmailBaseUrl(): string {
+  const u = process.env.SITE_URL || process.env.NEXTAUTH_URL || "https://yaraandco.vercel.app";
+  return u.replace(/\/$/, "");
+}
+
 function baseWrapper(content: string, preheader = ""): string {
+  const baseUrl = getEmailBaseUrl();
+  const logoUrl = `${baseUrl}/logo.png`;
   const preheaderBlock = preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>`
     : "";
@@ -34,13 +42,11 @@ function baseWrapper(content: string, preheader = ""): string {
     <tr>
       <td align="center" style="padding:40px 20px;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;margin:0 auto;">
-          <!-- Header -->
+          <!-- Header con logo -->
           <tr>
             <td style="padding-bottom:32px;border-bottom:${BORDER};">
-              <p style="margin:0;font-size:28px;font-weight:bold;letter-spacing:0.02em;color:${GOLD_SOFT};">
-                ${BRAND}
-              </p>
-              <p style="margin:6px 0 0 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${MUTED};">
+              <img src="${logoUrl}" alt="${BRAND}" width="160" height="64" style="display:block;max-width:160px;height:auto;margin:0 auto;" />
+              <p style="margin:10px 0 0 0;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${MUTED};">
                 ${TAGLINE}
               </p>
             </td>

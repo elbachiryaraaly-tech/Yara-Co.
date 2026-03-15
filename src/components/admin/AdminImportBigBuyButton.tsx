@@ -16,10 +16,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/providers/ToastProvider";
 
+const FETCH_TIMEOUT_MS = 35000;
+
 export function AdminImportBigBuyButton() {
   const [open, setOpen] = useState(false);
   const [bigbuyId, setBigbuyId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -28,6 +31,7 @@ export function AdminImportBigBuyButton() {
     if (!id) return;
     const num = parseInt(id, 10);
     if (!Number.isInteger(num) || num <= 0) {
+      setError("El ID debe ser un número válido.");
       toast({
         title: "ID inválido",
         description: "El ID del producto de BigBuy debe ser un número.",
@@ -35,19 +39,33 @@ export function AdminImportBigBuyButton() {
       });
       return;
     }
+    setError(null);
     setLoading(true);
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
       const res = await fetch("/api/admin/products/import/bigbuy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bigbuyProductId: num }),
+        signal: controller.signal,
       });
 
-      const data = await res.json();
+      clearTimeout(timeoutId);
+
+      let data: { error?: string; message?: string };
+      try {
+        data = await res.json();
+      } catch {
+        data = { error: res.statusText || "Respuesta inválida del servidor" };
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || "Error importando producto de BigBuy");
+        const msg = data.error || "Error importando producto de BigBuy";
+        setError(msg);
+        throw new Error(msg);
       }
 
       toast({
@@ -57,11 +75,19 @@ export function AdminImportBigBuyButton() {
 
       setOpen(false);
       setBigbuyId("");
+      setError(null);
       router.refresh();
     } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.name === "AbortError"
+            ? "Tiempo de espera agotado. La API de BigBuy puede estar lenta. Intenta de nuevo."
+            : err.message
+          : "Error desconocido";
+      setError(message);
       toast({
         title: "Error de importación",
-        description: err instanceof Error ? err.message : "Desconocido",
+        description: message,
         variant: "error",
       });
     } finally {
@@ -70,7 +96,13 @@ export function AdminImportBigBuyButton() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) setError(null);
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -120,6 +152,7 @@ export function AdminImportBigBuyButton() {
             Cancelar
           </Button>
           <Button
+            type="button"
             onClick={handleImport}
             disabled={!bigbuyId.trim() || loading}
             className="bg-[var(--gold)] text-[var(--ink)] hover:bg-[var(--gold-soft)]"

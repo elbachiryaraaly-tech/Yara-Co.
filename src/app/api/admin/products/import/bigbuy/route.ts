@@ -169,8 +169,9 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Error importando desde BigBuy:", error);
+    const message = error instanceof Error ? error.message : "Error interno importando el producto de BigBuy.";
     return NextResponse.json(
-      { error: "Error interno importando el producto de BigBuy." },
+      { error: message },
       { status: 500 }
     );
   }

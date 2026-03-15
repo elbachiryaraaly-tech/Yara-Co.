@@ -19,7 +19,10 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.SITE_URL || "https://yaraandco.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Yara & Co. | Lujo Redefinido - Perfumes, Relojes, Joyería",
     template: "%s | Yara & Co.",
@@ -27,9 +30,14 @@ export const metadata: Metadata = {
   description:
     "Tienda de lujo online. Perfumes exclusivos, relojes premium, joyería y accesorios de élite. Envío gratis. Garantía de autenticidad.",
   keywords: ["lujo", "perfumes", "relojes", "joyería", "accesorios", "premium", "Yara & Co."],
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     type: "website",
     locale: "es_ES",
+    images: ["/logo.png"],
   },
   robots: {
     index: true,

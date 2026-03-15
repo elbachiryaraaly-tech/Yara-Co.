@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type LogoProps = {
@@ -52,10 +54,29 @@ function LogoMark({ className }: { className?: string }) {
 }
 
 export function Logo({ href = "/", variant = "header", className }: LogoProps) {
+  const [imgError, setImgError] = useState(false);
   const isHeader = variant === "header";
   const isAdmin = variant === "admin";
+  const useImage = !imgError;
 
-  const content = (
+  const imageContent = (
+    <Image
+      src="/logo.png"
+      alt="Yara & Co."
+      width={160}
+      height={64}
+      className={cn(
+        "h-auto w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]",
+        isHeader && "max-h-9 sm:max-h-10",
+        isAdmin && "max-h-8",
+        variant === "footer" && "max-h-8 opacity-90"
+      )}
+      onError={() => setImgError(true)}
+      priority
+    />
+  );
+
+  const fallbackContent = (
     <span className="inline-flex items-center gap-2.5">
       <span
         className={cn(
@@ -83,6 +104,8 @@ export function Logo({ href = "/", variant = "header", className }: LogoProps) {
       </span>
     </span>
   );
+
+  const content = useImage ? imageContent : fallbackContent;
 
   const wrapperClass = cn(
     "inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--ink)]",
