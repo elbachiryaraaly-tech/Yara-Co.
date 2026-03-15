@@ -4,34 +4,36 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Instagram, Mail } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 const footerLinks = {
   comprar: [
-    { href: "/productos", label: "Tienda" },
-    { href: "/productos?categoria=perfumes", label: "Perfumes" },
-    { href: "/productos?categoria=relojes", label: "Relojes" },
-    { href: "/productos?categoria=joyeria", label: "Joyería" },
+    { href: "/productos", key: "nav.shop" },
+    { href: "/productos?categoria=perfumes", key: "nav.perfumes" },
+    { href: "/productos?categoria=relojes", key: "nav.watches" },
+    { href: "/productos?categoria=joyeria", key: "nav.jewelry" },
   ],
   ayuda: [
-    { href: "/contacto", label: "Contacto" },
-    { href: "/envios", label: "Envíos" },
-    { href: "/devoluciones", label: "Devoluciones" },
+    { href: "/contacto", key: "footer.contact" },
+    { href: "/envios", key: "footer.shipping" },
+    { href: "/devoluciones", key: "footer.returns" },
   ],
   legal: [
-    { href: "/privacidad", label: "Privacidad" },
-    { href: "/terminos", label: "Términos" },
+    { href: "/privacidad", key: "footer.privacy" },
+    { href: "/terminos", key: "footer.terms" },
   ],
 };
 
 export function Footer() {
+  const { t } = useLocale();
   return (
     <footer className="border-t border-[var(--gold)]/10 bg-[var(--ink)]">
       <div className="container mx-auto px-6 lg:px-12 py-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-20">
           <div>
             <Logo href="/" variant="footer" className="block" />
-            <p className="mt-6 text-sm text-muted-foreground max-w-[200px]">
-              Lujo redefinido. Perfumes, relojes y joyería de élite.
+            <p className="mt-6 text-sm text-[var(--foreground)]/55 max-w-[200px] leading-relaxed">
+              {t("footer.tagline")}
             </p>
             <div className="mt-8 flex gap-4">
               <a
@@ -53,7 +55,7 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[var(--foreground)]/50 mb-6">Comprar</p>
+            <p className="text-xs uppercase tracking-[0.22em] text-[var(--foreground)]/50 mb-6">{t("footer.buy")}</p>
             <ul className="space-y-3">
               {footerLinks.comprar.map((link) => (
                 <li key={link.href}>
@@ -61,14 +63,14 @@ export function Footer() {
                     href={link.href}
                     className="text-sm text-[var(--foreground)]/80 hover:text-[var(--gold)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[var(--foreground)]/50 mb-6">Ayuda</p>
+            <p className="text-xs uppercase tracking-[0.22em] text-[var(--foreground)]/50 mb-6">{t("footer.help")}</p>
             <ul className="space-y-3">
               {footerLinks.ayuda.map((link) => (
                 <li key={link.href}>
@@ -76,14 +78,14 @@ export function Footer() {
                     href={link.href}
                     className="text-sm text-[var(--foreground)]/80 hover:text-[var(--gold)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-6">Legal</p>
+            <p className="text-xs uppercase tracking-[0.22em] text-[var(--foreground)]/50 mb-6">{t("footer.legal")}</p>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
@@ -91,7 +93,7 @@ export function Footer() {
                     href={link.href}
                     className="text-sm text-[var(--foreground)]/80 hover:text-[var(--gold)] transition-colors"
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -100,10 +102,10 @@ export function Footer() {
         </div>
         <div className="mt-20 pt-10 border-t border-[var(--gold)]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[var(--foreground)]/50 uppercase tracking-[0.15em]">
-            © {new Date().getFullYear()} Yara & Co. Todos los derechos reservados.
+            © {new Date().getFullYear()} {t("footer.rights")}
           </p>
           <span className="font-display text-sm tracking-[0.2em] text-[var(--foreground)]/60 uppercase">
-            Sevilla, España
+            {t("footer.location")}
           </span>
         </div>
       </div>

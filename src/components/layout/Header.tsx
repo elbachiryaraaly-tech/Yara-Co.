@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search, ShoppingBag, User, Heart } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,18 +14,21 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/components/providers/CartProvider";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
 
 const navLinks = [
-  { href: "/productos", label: "Tienda" },
-  { href: "/productos?categoria=perfumes", label: "Perfumes" },
-  { href: "/productos?categoria=relojes", label: "Relojes" },
-  { href: "/productos?categoria=joyeria", label: "Joyería" },
-  { href: "/productos?categoria=accesorios", label: "Accesorios" },
+  { href: "/productos", key: "nav.shop" },
+  { href: "/productos?categoria=perfumes", key: "nav.perfumes" },
+  { href: "/productos?categoria=relojes", key: "nav.watches" },
+  { href: "/productos?categoria=joyeria", key: "nav.jewelry" },
+  { href: "/productos?categoria=accesorios", key: "nav.accessories" },
 ];
 
 export function Header() {
   const router = useRouter();
+  const { t } = useLocale();
   const { data: session, status } = useSession();
   const { items: cartItems } = useCart();
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -54,16 +56,13 @@ export function Header() {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <motion.header
+    <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-700 animate-header-slide",
         scrolled
           ? "glass-effect border-b border-[var(--gold)]/10"
           : "bg-transparent"
       )}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="container mx-auto px-6 lg:px-12 h-20 lg:h-24 flex items-center justify-between">
         <Logo href="/" variant="header" className="flex items-center" />
@@ -75,56 +74,42 @@ export function Header() {
               href={link.href}
               className="text-[13px] font-medium text-foreground/80 hover:text-foreground tracking-[0.08em] link-underline"
             >
-              {link.label}
+              {t(link.key)}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-1">
-          <motion.button
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher className="hidden sm:flex" />
+          <button
             type="button"
             onClick={() => setSearchOpen((o) => !o)}
-            className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10"
-            aria-label="Buscar"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10 transition-transform hover:scale-110 active:scale-95"
+            aria-label={t("nav.search")}
           >
             <Search className="h-4 w-4" />
-          </motion.button>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+          </button>
+          <Link
+            href="/cuenta/wishlist"
+            className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10 block transition-transform hover:scale-110 active:scale-95"
+            aria-label="Lista de deseos"
           >
-            <Link
-              href="/cuenta/wishlist"
-              className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10 block"
-              aria-label="Lista de deseos"
-            >
-              <Heart className="h-4 w-4" />
-            </Link>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            <Heart className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/carrito"
+            className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10 block transition-transform hover:scale-110 active:scale-95"
+            aria-label={t("nav.cart")}
           >
-            <Link
-              href="/carrito"
-              className="relative p-2.5 text-muted-foreground hover:text-gold transition-colors rounded-full hover:bg-[var(--gold)]/10 block"
-              aria-label="Carrito"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              {cartCount > 0 && (
-                <motion.span
-                  className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-[var(--gold)] text-[var(--ink)] text-[10px] font-semibold flex items-center justify-center shadow-lg"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                >
-                  {cartCount > 99 ? "99+" : cartCount}
-                </motion.span>
-              )}
-            </Link>
-          </motion.div>
+            <ShoppingBag className="h-4 w-4" />
+            {cartCount > 0 && (
+              <span
+                className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-[var(--gold)] text-[var(--ink)] text-[10px] font-semibold flex items-center justify-center shadow-lg"
+              >
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button
@@ -142,7 +127,7 @@ export function Header() {
                   onClick={closeDropdown}
                   className="block w-full cursor-pointer rounded-lg px-2 py-1.5 text-sm outline-none focus:bg-[var(--elevated)] focus:text-[var(--foreground)]"
                 >
-                  Mi cuenta
+                  {t("nav.myAccount")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -151,7 +136,7 @@ export function Header() {
                   onClick={closeDropdown}
                   className="block w-full cursor-pointer rounded-lg px-2 py-1.5 text-sm outline-none focus:bg-[var(--elevated)] focus:text-[var(--foreground)]"
                 >
-                  Mis pedidos
+                  {t("nav.myOrders")}
                 </Link>
               </DropdownMenuItem>
               {status === "authenticated" ? (
@@ -159,7 +144,7 @@ export function Header() {
                   onClick={() => { closeDropdown(); signOut({ callbackUrl: typeof window !== "undefined" ? `${window.location.origin}/` : "/" }); }}
                   className="cursor-pointer rounded-lg px-2 py-1.5 text-sm outline-none focus:bg-[var(--elevated)] focus:text-[var(--foreground)]"
                 >
-                  Cerrar sesión
+                  {t("nav.logout")}
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem asChild>
@@ -168,7 +153,7 @@ export function Header() {
                     onClick={closeDropdown}
                     className="block w-full cursor-pointer rounded-lg px-2 py-1.5 text-sm outline-none focus:bg-[var(--elevated)] focus:text-[var(--foreground)]"
                   >
-                    Iniciar sesión
+                    {t("nav.login")}
                   </Link>
                 </DropdownMenuItem>
               )}
@@ -185,73 +170,51 @@ export function Header() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-[var(--border)] bg-[var(--ink)]"
-          >
-            <form onSubmit={handleSearch} className="container mx-auto px-6 py-4">
-              <Input
-                type="search"
-                placeholder="Buscar productos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-xl mx-auto rounded-none border-[var(--border)] bg-transparent focus-visible:ring-[var(--gold)]"
-                autoFocus
-              />
-              <button type="submit" className="sr-only">
-                Buscar
-              </button>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {searchOpen && (
+        <div
+          className="overflow-hidden border-t border-[var(--border)] bg-[var(--ink)] animate-[slide-up-fade_0.3s_ease-out]"
+        >
+          <form onSubmit={handleSearch} className="container mx-auto px-6 py-4">
+            <Input
+              type="search"
+              placeholder="Buscar productos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-xl mx-auto rounded-none border-[var(--border)] bg-transparent focus-visible:ring-[var(--gold)]"
+              autoFocus
+            />
+            <button type="submit" className="sr-only">
+              {t("nav.search")}
+            </button>
+          </form>
+        </div>
+      )}
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="lg:hidden absolute top-full left-0 right-0 glass-effect border-t border-[var(--gold)]/20"
-          >
-            <nav className="container mx-auto px-6 py-8 flex flex-col gap-4">
-              {navLinks.map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <Link
-                    href={link.href}
-                    onClick={closeMobile}
-                    className="block text-foreground/90 hover:text-[var(--gold)] text-sm tracking-wider uppercase py-2 transition-colors border-b border-[var(--border)]/30 hover:border-[var(--gold)]/30"
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navLinks.length * 0.05 }}
+      {mobileOpen && (
+        <div
+          className="lg:hidden absolute top-full left-0 right-0 glass-effect border-t border-[var(--gold)]/20 animate-panel-in"
+        >
+          <nav className="container mx-auto px-6 py-8 flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={closeMobile}
+                className="block text-foreground/90 hover:text-[var(--gold)] text-sm tracking-wider uppercase py-2 transition-colors border-b border-[var(--border)]/30 hover:border-[var(--gold)]/30"
               >
-                <Link
-                  href="/cuenta"
-                  onClick={closeMobile}
-                  className="block text-foreground/90 hover:text-[var(--gold)] text-sm tracking-wider uppercase py-2 transition-colors border-b border-[var(--border)]/30 hover:border-[var(--gold)]/30"
-                >
-                  Mi cuenta
-                </Link>
-              </motion.div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+                {t(link.key)}
+              </Link>
+            ))}
+            <Link
+              href="/cuenta"
+              onClick={closeMobile}
+              className="block text-foreground/90 hover:text-[var(--gold)] text-sm tracking-wider uppercase py-2 transition-colors border-b border-[var(--border)]/30 hover:border-[var(--gold)]/30"
+            >
+              {t("nav.myAccount")}
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }

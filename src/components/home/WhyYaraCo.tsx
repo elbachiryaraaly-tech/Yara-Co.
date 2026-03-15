@@ -2,15 +2,17 @@
 
 import { motion } from "framer-motion";
 import { Shield, Truck, Award, HeadphonesIcon } from "lucide-react";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 const pillars = [
-  { icon: Award, label: "01", title: "Calidad Premium", desc: "Autenticidad y excelencia en cada artículo." },
-  { icon: Truck, label: "02", title: "Envío Gratis", desc: "Pedidos +50€ en toda España." },
-  { icon: Shield, label: "03", title: "Garantía 2 Años", desc: "Cobertura total en productos de lujo." },
-  { icon: HeadphonesIcon, label: "04", title: "Soporte 24/7", desc: "Equipo dedicado a tu servicio." },
+  { icon: Award, label: "01", titleKey: "home.why.quality", descKey: "home.why.qualityDesc" },
+  { icon: Truck, label: "02", titleKey: "home.why.shipping", descKey: "home.why.shippingDesc" },
+  { icon: Shield, label: "03", titleKey: "home.why.warranty", descKey: "home.why.warrantyDesc" },
+  { icon: HeadphonesIcon, label: "04", titleKey: "home.why.support", descKey: "home.why.supportDesc" },
 ];
 
 export function WhyYaraCo() {
+  const { t } = useLocale();
   return (
     <section className="relative py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-gradient-to-b from-[var(--elevated)] to-[var(--ink)] overflow-hidden">
       {/* Orbes sutiles (como hero) */}
@@ -32,7 +34,7 @@ export function WhyYaraCo() {
         >
           {pillars.map((item, i) => (
             <motion.div
-              key={item.title}
+              key={item.titleKey}
               className="group relative bg-[var(--ink)] p-10 lg:p-12 flex flex-col hover-lift perspective-3d"
               variants={{
                 visible: { opacity: 1, y: 0, rotateX: 0 },
@@ -90,10 +92,10 @@ export function WhyYaraCo() {
               </motion.div>
               
               <h3 className="font-display text-lg lg:text-xl font-semibold text-[var(--foreground)] mb-3 group-hover:text-[var(--gold)] transition-colors duration-300">
-                {item.title}
+                {t(item.titleKey)}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed group-hover:text-foreground/80 transition-colors duration-300">
-                {item.desc}
+                {t(item.descKey)}
               </p>
               
               {/* Línea decorativa (hero style) */}

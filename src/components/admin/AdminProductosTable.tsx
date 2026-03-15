@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/utils";
-import { Search, ChevronLeft, ChevronRight, Pencil, Eye, Trash2, Loader2 } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Pencil, Eye, Trash2, Loader2, Star } from "lucide-react";
 import { useToast } from "@/components/providers/ToastProvider";
 import {
   AlertDialog,
@@ -47,6 +47,7 @@ export function AdminProductosTable({
   const [search, setSearch] = useState(initialSearch);
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isTogglingFeatured, setIsTogglingFeatured] = useState<string | null>(null);
 
   const handleDelete = async (id: string, name: string) => {
     try {
@@ -75,6 +76,34 @@ export function AdminProductosTable({
       });
     } finally {
       setIsDeleting(null);
+    }
+  };
+
+  const handleToggleFeatured = async (id: string, currentFeatured: boolean) => {
+    try {
+      setIsTogglingFeatured(id);
+      const res = await fetch(`/api/admin/products/${id}/featured`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured: !currentFeatured }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al actualizar destacado");
+      toast({
+        title: currentFeatured ? "Quitado de destacados" : "Añadido a destacados",
+        description: currentFeatured
+          ? "El producto ya no se mostrará en la página principal."
+          : "El producto se mostrará en la sección Destacados de la página principal.",
+      });
+      router.refresh();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "No se pudo actualizar el destacado",
+        variant: "error",
+      });
+    } finally {
+      setIsTogglingFeatured(null);
     }
   };
 
@@ -150,6 +179,9 @@ export function AdminProductosTable({
                     <th className="pb-3 px-6 font-medium">Categoría</th>
                     <th className="pb-3 px-6 font-medium">Proveedor</th>
                     <th className="pb-3 px-6 font-medium">Estado</th>
+                    <th className="pb-3 px-6 font-medium text-center w-24" title="Mostrar en página principal">
+                      Destacado
+                    </th>
                     <th className="pb-3 px-6 font-medium w-32">Acciones</th>
                   </tr>
                 </thead>
@@ -203,6 +235,22 @@ export function AdminProductosTable({
                         >
                           {p.isActive ? "Activo" : "Oculto"}
                         </span>
+                      </td>
+                      <td className="py-3 px-6 text-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-9 w-9 rounded-lg transition-colors ${p.isFeatured ? "text-[var(--gold)] hover:bg-[var(--gold)]/10" : "text-muted-foreground hover:text-[var(--foreground)]"}`}
+                          onClick={() => handleToggleFeatured(p.id, p.isFeatured)}
+                          disabled={isTogglingFeatured === p.id}
+                          title={p.isFeatured ? "Quitar de destacados (página principal)" : "Marcar como destacado (mostrar en página principal)"}
+                        >
+                          {isTogglingFeatured === p.id ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Star className={`h-5 w-5 ${p.isFeatured ? "fill-current" : ""}`} />
+                          )}
+                        </Button>
                       </td>
                       <td className="py-3 px-6">
                         <div className="flex items-center gap-2">

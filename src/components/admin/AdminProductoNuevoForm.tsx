@@ -411,7 +411,7 @@ export function AdminProductoNuevoForm({
             </label>
             <label className="flex items-center gap-2 text-[var(--foreground)] cursor-pointer">
               <input type="checkbox" {...register("isFeatured")} className="rounded border-[var(--border)]" />
-              Destacado
+              Destacado en página principal
             </label>
           </div>
         </CardContent>

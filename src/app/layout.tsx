@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
+import { LocaleProvider } from "@/components/providers/LocaleProvider";
 import { cn } from "@/lib/utils";
 
 const playfair = Playfair_Display({
@@ -57,10 +58,12 @@ export default function RootLayout({
     <html lang="es" className={cn("dark", "font-sans")}>
       <body className={`${playfair.variable} ${montserrat.variable} font-body min-h-screen bg-[var(--background)] text-[var(--foreground)]`}>
         <SessionProvider>
-          <CartProvider>
-            <SiteShell>{children}</SiteShell>
-            <Toaster />
-          </CartProvider>
+          <LocaleProvider>
+            <CartProvider>
+              <SiteShell>{children}</SiteShell>
+              <Toaster />
+            </CartProvider>
+          </LocaleProvider>
         </SessionProvider>
       </body>
     </html>

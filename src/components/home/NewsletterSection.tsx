@@ -4,8 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 export function NewsletterSection() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -24,10 +26,10 @@ export function NewsletterSection() {
     if (res.ok) {
       setStatus("success");
       setEmail("");
-      setMessage("Gracias. Te hemos añadido a la lista.");
+      setMessage(t("home.newsletterSuccess"));
     } else {
       setStatus("error");
-      setMessage(json.error ?? "Error al suscribirse.");
+      setMessage(json.error ?? t("home.newsletterError"));
     }
   };
 
@@ -43,19 +45,19 @@ export function NewsletterSection() {
           <div className="flex items-center gap-3 mb-3">
             <span className="h-px w-12 bg-[var(--gold)]/80" />
             <p className="text-[var(--gold)] text-sm uppercase tracking-[0.25em] font-medium">
-              Newsletter
+              {t("home.newsletter")}
             </p>
           </div>
           <h2 className="font-display text-display-sm text-[var(--foreground)] tracking-tighter mb-4">
-            Únete a la comunidad
+            {t("home.newsletterTitle")}
           </h2>
           <p className="text-[var(--foreground)]/60 mb-10 text-[15px] leading-relaxed">
-            10% de descuento en tu primera compra al suscribirte.
+            {t("home.newsletterDesc")}
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
             <Input
               type="email"
-              placeholder="tu@email.com"
+              placeholder={t("home.newsletterPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={status === "loading"}
@@ -66,7 +68,7 @@ export function NewsletterSection() {
               disabled={status === "loading"}
               className="rounded-none bg-[var(--gold)] text-[var(--ink)] hover:bg-[var(--gold-soft)] font-medium uppercase tracking-[0.18em] shrink-0 transition-colors duration-300"
             >
-              {status === "loading" ? "Enviando…" : "Suscribirme"}
+              {status === "loading" ? t("home.newsletterSending") : t("home.newsletterSubmit")}
             </Button>
           </form>
           {message && (

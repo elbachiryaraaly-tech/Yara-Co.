@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 export function ContactForm() {
+  const { t } = useLocale();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -33,14 +35,14 @@ export function ContactForm() {
 
       if (!res.ok) {
         setStatus("error");
-        setErrorMessage(json.error ?? "Error al enviar. Inténtalo de nuevo.");
+        setErrorMessage(json.error ?? t("contact.errorSend"));
         return;
       }
       setStatus("success");
       form.reset();
     } catch {
       setStatus("error");
-      setErrorMessage("Error de conexión. Inténtalo de nuevo.");
+      setErrorMessage(t("contact.errorConnection"));
     }
   };
 
@@ -48,7 +50,7 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {status === "success" && (
         <p className="text-sm text-emerald-400 bg-emerald-400/10 p-3 rounded-lg">
-          Mensaje enviado correctamente. Te contestaremos en 24–48 horas laborables.
+          {t("contact.success")}
         </p>
       )}
       {status === "error" && errorMessage && (
@@ -56,48 +58,48 @@ export function ContactForm() {
       )}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="nombre" className="text-[var(--foreground)]">Nombre *</Label>
+          <Label htmlFor="nombre" className="text-[var(--foreground)]">{t("contact.name")}</Label>
           <Input
             id="nombre"
             name="nombre"
             required
-            placeholder="Tu nombre"
+            placeholder={t("contact.namePlaceholder")}
             className="bg-[var(--elevated)] border-[var(--border)]"
             disabled={status === "sending"}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-[var(--foreground)]">Email *</Label>
+          <Label htmlFor="email" className="text-[var(--foreground)]">{t("contact.email")}</Label>
           <Input
             id="email"
             name="email"
             type="email"
             required
-            placeholder="tu@email.com"
+            placeholder={t("contact.emailPlaceholder")}
             className="bg-[var(--elevated)] border-[var(--border)]"
             disabled={status === "sending"}
           />
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="asunto" className="text-[var(--foreground)]">Asunto *</Label>
+        <Label htmlFor="asunto" className="text-[var(--foreground)]">{t("contact.subject")}</Label>
         <Input
           id="asunto"
           name="asunto"
           required
-          placeholder="Ej: Consulta sobre pedido"
+          placeholder={t("contact.subjectPlaceholder")}
           className="bg-[var(--elevated)] border-[var(--border)]"
           disabled={status === "sending"}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="mensaje" className="text-[var(--foreground)]">Mensaje *</Label>
+        <Label htmlFor="mensaje" className="text-[var(--foreground)]">{t("contact.message")}</Label>
         <textarea
           id="mensaje"
           name="mensaje"
           required
           rows={5}
-          placeholder="Escribe tu mensaje..."
+          placeholder={t("contact.messagePlaceholder")}
           className="w-full rounded-lg border border-[var(--border)] bg-[var(--elevated)] px-3 py-2 text-[var(--foreground)] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--gold)] disabled:opacity-60"
           disabled={status === "sending"}
         />
@@ -107,7 +109,7 @@ export function ContactForm() {
         disabled={status === "sending"}
         className="rounded-xl bg-[var(--gold)] text-[var(--ink)] hover:bg-[var(--gold-soft)] font-medium w-full sm:w-auto"
       >
-        {status === "sending" ? "Enviando…" : "Enviar mensaje"}
+        {status === "sending" ? t("contact.sending") : t("contact.send")}
       </Button>
     </form>
   );

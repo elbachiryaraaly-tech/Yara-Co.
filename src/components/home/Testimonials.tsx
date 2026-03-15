@@ -1,23 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
-const testimonials = [
-  {
-    quote: "La mejor tienda de lujo online. El perfume que pedí superó mis expectativas. Envío rápido y packaging impecable.",
-    author: "María G.",
-  },
-  {
-    quote: "Reloj recibido en 48h. Calidad excepcional y atención al cliente de 10. Repetiré sin dudarlo.",
-    author: "Carlos R.",
-  },
-  {
-    quote: "Yara & Co. ha redefinido mi forma de comprar lujo. Todo auténtico, precios justos y una web preciosa.",
-    author: "Laura M.",
-  },
+const testimonialKeys = [
+  { quoteKey: "home.testimonial1", authorKey: "home.testimonial1Author" },
+  { quoteKey: "home.testimonial2", authorKey: "home.testimonial2Author" },
+  { quoteKey: "home.testimonial3", authorKey: "home.testimonial3Author" },
 ];
 
 export function Testimonials() {
+  const { t } = useLocale();
   return (
     <section className="relative py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-gradient-to-b from-[var(--ink)] to-[var(--elevated)] overflow-hidden">
       {/* Ambiente sutil (continuidad hero) */}
@@ -60,9 +53,9 @@ export function Testimonials() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
-          {testimonials.map((t, i) => (
+          {testimonialKeys.map((item, i) => (
             <motion.blockquote
-              key={t.author}
+              key={item.authorKey}
               className="group relative border-l-2 border-[var(--gold)]/25 hover:border-[var(--gold)]/70 pl-8 pr-4 py-4 transition-all duration-500 hover:bg-[var(--ink)]/40 rounded-r-sm"
               initial={{ opacity: 0, y: 30, x: -20 }}
               whileInView={{ opacity: 1, y: 0, x: 0 }}
@@ -86,7 +79,7 @@ export function Testimonials() {
                 whileHover={{ color: "var(--gold)" }}
                 transition={{ duration: 0.3 }}
               >
-                {t.quote}
+                {t(item.quoteKey)}
               </motion.p>
               
               <motion.footer
@@ -103,7 +96,7 @@ export function Testimonials() {
                 >
                   ✦
                 </motion.span>
-                {t.author}
+                {t(item.authorKey)}
               </motion.footer>
               
               {/* Línea decorativa inferior */}

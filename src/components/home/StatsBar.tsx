@@ -2,12 +2,13 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 const stats = [
-  { value: 2000, suffix: "+", label: "Clientes satisfechos", duration: 2 },
-  { value: 24, suffix: "h", label: "Envío express disponible", duration: 1.5 },
-  { value: 4.9, suffix: "", label: "Valoración media", duration: 1.5 },
-  { value: 100, suffix: "%", label: "Productos auténticos", duration: 1.5 },
+  { value: 2000, suffix: "+", key: "home.stats.clients", duration: 2 },
+  { value: 24, suffix: "h", key: "home.stats.express", duration: 1.5 },
+  { value: 4.9, suffix: "", key: "home.stats.rating", duration: 1.5 },
+  { value: 100, suffix: "%", key: "home.stats.authentic", duration: 1.5 },
 ];
 
 function AnimatedNumber({ 
@@ -50,6 +51,7 @@ function AnimatedNumber({
 }
 
 export function StatsBar() {
+  const { t } = useLocale();
   return (
     <section className="relative border-y border-[var(--gold)]/10 bg-[var(--ink)] py-16 lg:py-20 overflow-hidden">
       {/* Líneas verticales sutiles (mismo lenguaje que hero) */}
@@ -72,7 +74,7 @@ export function StatsBar() {
         >
           {stats.map((stat, i) => (
             <motion.div
-              key={stat.label}
+              key={stat.key}
               className="text-center lg:text-left relative group"
               variants={{
                 visible: { opacity: 1, y: 0 },
@@ -102,7 +104,7 @@ export function StatsBar() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 + i * 0.1 }}
                 >
-                  {stat.label}
+                  {t(stat.key)}
                 </motion.p>
               </div>
               

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 const DEFAULT_COLLECTIONS = [
   { href: "/productos?categoria=perfumes", title: "Perfumes", subtitle: "Fragancias exclusivas", image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&q=80" },
@@ -14,6 +15,7 @@ const DEFAULT_COLLECTIONS = [
 type Collection = { href: string; title: string; subtitle: string; image: string };
 
 export function FeaturedCollections({ collections = DEFAULT_COLLECTIONS }: { collections?: Collection[] }) {
+  const { t } = useLocale();
   const list = collections.length > 0 ? collections : DEFAULT_COLLECTIONS;
   return (
     <section className="py-24 lg:py-32 border-t border-[var(--gold)]/10 bg-[var(--elevated)]">
@@ -27,11 +29,11 @@ export function FeaturedCollections({ collections = DEFAULT_COLLECTIONS }: { col
           <div className="flex items-center gap-3 mb-3">
             <span className="h-px w-12 bg-[var(--gold)]/80" />
             <p className="text-[var(--gold)] text-sm uppercase tracking-[0.25em] font-medium">
-              Categorías
+              {t("home.categories")}
             </p>
           </div>
           <h2 className="font-display text-display-sm text-[var(--foreground)] tracking-tighter">
-            Colecciones
+            {t("home.collections")}
           </h2>
         </motion.div>
 

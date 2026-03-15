@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/components/providers/LocaleProvider";
 
 const SLIDE_DURATION_MS = 5000;
 
@@ -23,6 +24,7 @@ function getHeroSlides() {
 }
 
 export function HeroSection() {
+  const { t } = useLocale();
   const SLIDES = useMemo(() => getHeroSlides(), []);
   const [currentSlide, setCurrentSlide] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -125,13 +127,14 @@ export function HeroSection() {
         />
       </motion.div>
 
-      {/* Degradado inferior: capa propia por ENCIMA de vídeos y overlay (z-[3]) */}
+      {/* Degradado inferior: por ENCIMA de vídeos y overlay para transición suave a la siguiente sección */}
       <div
-        className="absolute bottom-0 left-0 right-0 z-[3] pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 z-[4] pointer-events-none"
         style={{
           height: "38%",
           minHeight: "280px",
           background: "linear-gradient(to top, rgb(8,8,8) 0%, rgb(8,8,8) 15%, rgba(8,8,8,0.98) 32%, rgba(8,8,8,0.75) 52%, rgba(8,8,8,0.35) 75%, transparent 100%)",
+          transform: "translateZ(0)",
         }}
         aria-hidden
       />
@@ -206,7 +209,7 @@ export function HeroSection() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Lujo
+              {t("home.hero.title1")}
             </motion.span>
             <motion.span
               className={cn("block text-gradient-gold text-gradient-gold-animate relative")}
@@ -214,7 +217,7 @@ export function HeroSection() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.35 }}
             >
-              Redefinido
+              {t("home.hero.title2")}
               <motion.span
                 className="absolute -right-4 top-0 text-[var(--gold)]/20"
                 animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.1, 1] }}
@@ -231,7 +234,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
           >
-            Perfumes, relojes y joyería de élite. Envío gratis y autenticidad garantizada.
+            {t("home.hero.subtitle")}
           </motion.p>
 
           <motion.div
@@ -250,7 +253,7 @@ export function HeroSection() {
                 whileHover={{ x: "0%" }}
                 transition={{ duration: 0.5 }}
               />
-              <span className="relative z-10">Explorar colección</span>
+              <span className="relative z-10">{t("home.hero.cta")}</span>
               <motion.span
                 className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--paper)]/10 group-hover:bg-[var(--gold)]/20 transition-all duration-300"
                 whileHover={{ rotate: 45 }}
@@ -273,7 +276,7 @@ export function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.9 }}
           >
-            {["Envío gratis +50€", "Garantía 2 años", "Pago seguro"].map((text, i) => (
+            {[t("home.hero.badge1"), t("home.hero.badge2"), t("home.hero.badge3")].map((text, i) => (
               <motion.span
                 key={text}
                 initial={{ opacity: 0, x: -10 }}
