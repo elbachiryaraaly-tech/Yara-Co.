@@ -67,9 +67,9 @@ export function Logo({ href = "/", variant = "header", className }: LogoProps) {
       height={64}
       className={cn(
         "h-auto w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]",
-        isHeader && "max-h-9 sm:max-h-10",
+        isHeader && "max-h-11 sm:max-h-12",
         isAdmin && "max-h-8",
-        variant === "footer" && "max-h-8 opacity-90"
+        variant === "footer" && "max-h-9 opacity-90"
       )}
       onError={() => setImgError(true)}
       priority
@@ -81,7 +81,7 @@ export function Logo({ href = "/", variant = "header", className }: LogoProps) {
       <span
         className={cn(
           "shrink-0 text-[var(--gold)] transition-transform duration-200 group-hover:scale-105",
-          isHeader && "h-9 w-9 sm:h-10 sm:w-10",
+          isHeader && "h-11 w-11 sm:h-12 sm:w-12",
           isAdmin && "h-8 w-8",
           variant === "footer" && "h-8 w-8 text-[var(--gold)]/90"
         )}
