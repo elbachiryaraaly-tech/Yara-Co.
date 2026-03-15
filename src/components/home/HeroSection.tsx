@@ -9,13 +9,15 @@ import { cn } from "@/lib/utils";
 
 const SLIDE_DURATION_MS = 5000;
 
-// Construir slides en runtime para que las 4 variables de .env se detecten (reinicia dev si añades _4)
+// Rutas por defecto para despliegue (sin env vars): public/videos/slideN.mp4
+const DEFAULT_HERO_VIDEOS = ["/videos/slide1.mp4", "/videos/slide2.mp4", "/videos/slide3.mp4", "/videos/slide4.mp4"];
+
 function getHeroSlides() {
   const raw = [
-    process.env.NEXT_PUBLIC_HERO_VIDEO_1 ?? process.env.NEXT_PUBLIC_HERO_VIDEO_URL ?? "",
-    process.env.NEXT_PUBLIC_HERO_VIDEO_2 ?? "",
-    process.env.NEXT_PUBLIC_HERO_VIDEO_3 ?? "",
-    process.env.NEXT_PUBLIC_HERO_VIDEO_4 ?? "",
+    process.env.NEXT_PUBLIC_HERO_VIDEO_1 ?? process.env.NEXT_PUBLIC_HERO_VIDEO_URL ?? DEFAULT_HERO_VIDEOS[0],
+    process.env.NEXT_PUBLIC_HERO_VIDEO_2 ?? DEFAULT_HERO_VIDEOS[1],
+    process.env.NEXT_PUBLIC_HERO_VIDEO_3 ?? DEFAULT_HERO_VIDEOS[2],
+    process.env.NEXT_PUBLIC_HERO_VIDEO_4 ?? DEFAULT_HERO_VIDEOS[3],
   ].filter(Boolean);
   return raw.length > 0 ? raw.map((video) => ({ video })) : [{ video: "" }];
 }
