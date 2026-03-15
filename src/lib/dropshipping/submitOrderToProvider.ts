@@ -66,7 +66,7 @@ export async function submitOrderToProvider(
 
   // Re-obtener proveedor con accessToken (AliExpress OAuth; CJ/Printful para token)
   const code = provider.code?.toLowerCase();
-  if (code === "aliexpress" || code === "cj" || code === "printful") {
+  if (code === "aliexpress" || code === "cj" || code === "printful" || code === "bigbuy") {
     const fresh = await prisma.dropshippingProvider.findUnique({
       where: { id: provider.id },
       select: {
@@ -144,6 +144,22 @@ export async function submitOrderToProvider(
         success: false,
         logId: "",
         error: "Falta el ID de variante CJ en: " + names + ". Ve a Admin -> Productos, edita el producto y en cada variante rellena 'ID variante CJ (vid o SKU)' con el valor de la ficha del producto en CJDropshipping.",
+      };
+    }
+  }
+
+  // BigBuy exige SKU (o ID producto) por ítem
+  if (code === "bigbuy") {
+    const missing = itemsWithCjVariant.filter((i) => {
+      const sku = i.providerVariantId?.trim() || i.providerSku?.trim() || i.providerProductId?.trim();
+      return !sku;
+    });
+    if (missing.length > 0) {
+      const names = missing.map((i) => i.variantName ? i.productName + " (" + i.variantName + ")" : i.productName).join(", ");
+      return {
+        success: false,
+        logId: "",
+        error: "BigBuy: falta SKU en: " + names + ". En Admin → Productos, en cada variante rellena 'ID variante' o el SKU del producto en BigBuy.",
       };
     }
   }

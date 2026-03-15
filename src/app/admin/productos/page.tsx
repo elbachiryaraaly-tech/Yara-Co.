@@ -6,6 +6,7 @@ import { getAdminProducts } from "@/lib/admin";
 import { Plus } from "lucide-react";
 import { AdminImportCjButton } from "@/components/admin/AdminImportCjButton";
 import { AdminImportPrintfulButton } from "@/components/admin/AdminImportPrintfulButton";
+import { AdminImportBigBuyButton } from "@/components/admin/AdminImportBigBuyButton";
 
 export default async function AdminProductosPage({
   searchParams,
@@ -31,6 +32,7 @@ export default async function AdminProductosPage({
         <div className="flex items-center gap-2 shrink-0">
           <AdminImportCjButton />
           <AdminImportPrintfulButton />
+          <AdminImportBigBuyButton />
           <Button asChild className="rounded-xl bg-[var(--gold)] text-[var(--ink)] hover:bg-[var(--gold-soft)]">
             <Link href="/admin/productos/nuevo" className="gap-2">
               <Plus className="h-4 w-4" />

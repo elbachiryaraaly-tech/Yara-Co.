@@ -95,6 +95,19 @@ async function main() {
       data: { name: "Printful", code: "printful", accessToken: printfulToken, isActive: true },
     });
   }
+  // BigBuy: API Key (token) en Admin → Proveedores → Configurar API (o BIGBUY_API_KEY en .env)
+  const bigbuyToken = process.env.BIGBUY_API_KEY?.trim() || undefined;
+  const bigbuy = await prisma.dropshippingProvider.findFirst({ where: { code: "bigbuy" } });
+  if (bigbuy) {
+    await prisma.dropshippingProvider.update({
+      where: { id: bigbuy.id },
+      data: { name: "BigBuy", code: "bigbuy", apiKey: bigbuyToken ?? bigbuy.apiKey, accessToken: bigbuyToken ?? bigbuy.accessToken, isActive: true },
+    });
+  } else {
+    await prisma.dropshippingProvider.create({
+      data: { name: "BigBuy", code: "bigbuy", apiKey: bigbuyToken, accessToken: bigbuyToken, isActive: true },
+    });
+  }
   // Resto de proveedores si no existen
   const names = ["Proveedor demo"];
   for (const name of names) {

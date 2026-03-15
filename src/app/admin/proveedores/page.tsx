@@ -102,7 +102,7 @@ export default async function AdminProveedoresPage({
                     <div>
                       <h3 className="font-semibold text-[var(--foreground)]">{p.name}</h3>
                       <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-1">
-                        {p.apiKey || (p.code?.toLowerCase() === "printful" && (p as { accessToken?: string | null }).accessToken?.trim()) ? (
+                        {p.apiKey || (p.code?.toLowerCase() === "printful" && (p as { accessToken?: string | null }).accessToken?.trim()) || (p.code?.toLowerCase() === "bigbuy" && ((p as { accessToken?: string | null }).accessToken?.trim() || p.apiKey?.trim())) ? (
                           <>
                             <Key className="h-3.5 w-3 text-emerald-400" />
                             API conectada
@@ -183,6 +183,20 @@ export default async function AdminProveedoresPage({
                         developers.printful.com → Your tokens
                       </a>
                       y pégalo en Configurar API → Access Token.
+                    </p>
+                  )}
+                  {p.code?.toLowerCase() === "bigbuy" && !p.apiKey?.trim() && !(p as { accessToken?: string | null }).accessToken?.trim() && (
+                    <p className="text-[10px] text-muted-foreground w-full mb-1">
+                      BigBuy usa <strong>API Key (token)</strong>. Obténla en tu{" "}
+                      <a
+                        href="https://www.bigbuy.eu/es/account/api.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--gold)] hover:underline"
+                      >
+                        panel BigBuy → API
+                      </a>
+                      y pégalo en Configurar API → API Key.
                     </p>
                   )}
                   <AdminEditProvider providerId={p.id}>

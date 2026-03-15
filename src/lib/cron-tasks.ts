@@ -126,7 +126,8 @@ export async function syncTracking(): Promise<{
         provider &&
         order.providerOrderId &&
         (provider.apiKey?.trim() ||
-          (code === "printful" && (provider as { accessToken?: string | null }).accessToken?.trim()));
+          (code === "printful" && (provider as { accessToken?: string | null }).accessToken?.trim()) ||
+          (code === "bigbuy" && ((provider as { accessToken?: string | null }).accessToken?.trim() || provider.apiKey?.trim())));
       if (!hasAuth) continue;
 
       const providerOrderId = order.providerOrderId;

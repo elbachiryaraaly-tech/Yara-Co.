@@ -151,8 +151,9 @@ export function AdminEditProvider({ providerId, children }: { providerId: string
                 />
                 <p className="text-xs text-muted-foreground">
                   Usa <code className="bg-[var(--elevated)] px-1 rounded">cj</code>,{" "}
-                  <code className="bg-[var(--elevated)] px-1 rounded">aliexpress</code> o{" "}
-                  <code className="bg-[var(--elevated)] px-1 rounded">printful</code>.
+                  <code className="bg-[var(--elevated)] px-1 rounded">aliexpress</code>,{" "}
+                  <code className="bg-[var(--elevated)] px-1 rounded">printful</code> o{" "}
+                  <code className="bg-[var(--elevated)] px-1 rounded">bigbuy</code>.
                 </p>
               </div>
               <div className="space-y-2">
@@ -177,6 +178,20 @@ export function AdminEditProvider({ providerId, children }: { providerId: string
                       CJDropshipping → Mi CJ → API Key
                     </a>
                     . Pulsa <strong>Generate</strong> para crear una nueva. Solo necesitas la API Key (no hace falta API Secret para CJ).
+                  </p>
+                )}
+                {form.code?.toLowerCase() === "bigbuy" && (
+                  <p className="text-xs text-muted-foreground">
+                    Obtén tu token API en tu{" "}
+                    <a
+                      href="https://www.bigbuy.eu/es/account/api.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--gold)] hover:underline"
+                    >
+                      panel de BigBuy → API / Cuenta
+                    </a>
+                    . Pégalo en <strong>API Key</strong> (o en Access Token si lo prefieres). Los productos deben tener el <strong>SKU de BigBuy</strong> en ID variante o ID de producto.
                   </p>
                 )}
               </div>
