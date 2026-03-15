@@ -31,8 +31,11 @@ export const metadata: Metadata = {
     "Tienda de lujo online. Perfumes exclusivos, relojes premium, joyería y accesorios de élite. Envío gratis. Garantía de autenticidad.",
   keywords: ["lujo", "perfumes", "relojes", "joyería", "accesorios", "premium", "Yara & Co."],
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/logo.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",
