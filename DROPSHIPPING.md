@@ -62,6 +62,23 @@ Nota: si la API de dropshipping de AliExpress ha cambiado o está deprecada, la 
 
 ---
 
+### Shein (Open Platform)
+
+- **Documentación**: [open.sheincorp.com](https://open.sheincorp.com) (Plataforma Abierta SHEIN).
+- **Dónde obtener acceso**:
+  1. Regístrate como **Registered Business Seller** (vendedor en Shein) o **Third-party Partner (ISV)** según tu caso.
+  2. Crea una aplicación y obtén **API Key** o **Access Token** desde el portal de desarrollador.
+- **Importar productos por ID** (automático):
+  1. Añade en `.env` la variable **`SEARCHAPI_API_KEY`** (API Key de [SearchAPI.io](https://www.searchapi.io) — motor `shein_product`).
+  2. En **Admin → Proveedores** crea un proveedor con **Código**: `shein` y, si tienes Open Platform, rellena **API Key** o **Access Token** y **URL base** (opcional).
+  3. En **Admin → Productos** usa el botón **Importar Shein** y pega el **ID del producto** (ej. `33704388`) o la **URL** del producto (ej. `...-p-33704388.html`). El sistema importará título, imágenes, variantes y precios.
+- **Qué configurar en YaraLuxe**:
+  - **Código del adaptador**: `shein`.
+  - **API Key** o **Access Token**: el que te proporcione la Open Platform de Shein (para envío de pedidos).
+  - **URL base** (opcional): por defecto `https://openapi.sheincorp.com`; cámbiala si la documentación indica otra.
+
+---
+
 ## Dónde se configuran las APIs en el proyecto
 
 1. **Variables de entorno**  
@@ -71,7 +88,7 @@ Nota: si la API de dropshipping de AliExpress ha cambiado o está deprecada, la 
    - **Admin → Proveedores**: listado de proveedores.  
    - **Editar** un proveedor (botón “Configurar” o similar): ahí se guardan:
      - **Nombre**: nombre visible (ej. “CJDropshipping”, “AliExpress”).
-     - **Código**: `cj` o `aliexpress` para que el sistema use el adaptador correcto.
+     - **Código**: `cj`, `aliexpress` o `shein` para que el sistema use el adaptador correcto.
      - **API Key** (y **API Secret** si el proveedor lo pide).
      - **URL base** (opcional).
      - **Activo**: si está desactivado, no se enviarán pedidos a ese proveedor.

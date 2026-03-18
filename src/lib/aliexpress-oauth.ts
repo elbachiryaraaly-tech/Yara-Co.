@@ -109,7 +109,8 @@ async function exchangeCodeViaTokenCreateGet(params: {
     code: params.code,
     format: "json",
     redirect_uri: params.redirectUri,
-    sign_method: "sha256",
+    // AliExpress usa HMAC-SHA256 para la firma (consistente con la implementación createHmac).
+    sign_method: "hmac-sha256",
     timestamp,
   };
   const sortedKeys = Object.keys(payload).sort();

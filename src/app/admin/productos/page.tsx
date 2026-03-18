@@ -7,6 +7,8 @@ import { Plus } from "lucide-react";
 import { AdminImportCjButton } from "@/components/admin/AdminImportCjButton";
 import { AdminImportPrintfulButton } from "@/components/admin/AdminImportPrintfulButton";
 import { AdminImportBigBuyButton } from "@/components/admin/AdminImportBigBuyButton";
+import { AdminImportSheinButton } from "@/components/admin/AdminImportSheinButton";
+import { AdminImportAliExpressButton } from "@/components/admin/AdminImportAliExpressButton";
 
 export default async function AdminProductosPage({
   searchParams,
@@ -31,6 +33,8 @@ export default async function AdminProductosPage({
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <AdminImportCjButton />
+          <AdminImportSheinButton />
+          <AdminImportAliExpressButton />
           <AdminImportPrintfulButton />
           <AdminImportBigBuyButton />
           <Button asChild className="rounded-xl bg-[var(--gold)] text-[var(--ink)] hover:bg-[var(--gold-soft)]">

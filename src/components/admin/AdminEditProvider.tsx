@@ -146,11 +146,12 @@ export function AdminEditProvider({ providerId, children }: { providerId: string
                 <Input
                   value={form.code}
                   onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                  placeholder="cj | aliexpress"
+                  placeholder="cj | aliexpress | shein"
                   className="bg-[var(--elevated)] border-[var(--border)]"
                 />
                 <p className="text-xs text-muted-foreground">
                   Usa <code className="bg-[var(--elevated)] px-1 rounded">cj</code>,{" "}
+                  <code className="bg-[var(--elevated)] px-1 rounded">shein</code>,{" "}
                   <code className="bg-[var(--elevated)] px-1 rounded">aliexpress</code>,{" "}
                   <code className="bg-[var(--elevated)] px-1 rounded">printful</code> o{" "}
                   <code className="bg-[var(--elevated)] px-1 rounded">bigbuy</code>.

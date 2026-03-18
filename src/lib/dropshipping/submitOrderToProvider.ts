@@ -66,7 +66,7 @@ export async function submitOrderToProvider(
 
   // Re-obtener proveedor con accessToken (AliExpress OAuth; CJ/Printful para token)
   const code = provider.code?.toLowerCase();
-  if (code === "aliexpress" || code === "cj" || code === "printful" || code === "bigbuy") {
+  if (code === "aliexpress" || code === "cj" || code === "printful" || code === "bigbuy" || code === "shein") {
     const fresh = await prisma.dropshippingProvider.findUnique({
       where: { id: provider.id },
       select: {
@@ -87,6 +87,13 @@ export async function submitOrderToProvider(
   if (!provider.isActive) return { success: false, logId: "", error: "Proveedor inactivo" };
   if (!provider.apiKey?.trim() && !provider.code?.trim()) {
     return { success: false, logId: "", error: "Proveedor sin API configurada" };
+  }
+  if (code === "shein" && !provider.apiKey?.trim() && !(provider as { accessToken?: string | null }).accessToken?.trim()) {
+    return {
+      success: false,
+      logId: "",
+      error: "Shein: configura API Key o Access Token en Admin → Proveedores.",
+    };
   }
   if (code === "printful" && !(provider as { accessToken?: string | null }).accessToken?.trim()) {
     return {

@@ -17,6 +17,9 @@ export default async function AdminProveedoresPage({
 }) {
   const providers = await getAdminProviders();
   const params = await searchParams;
+  const hasAliExpressToken = providers.some(
+    (p) => p.code?.toLowerCase() === "aliexpress" && (p as { accessToken?: string | null }).accessToken?.trim()
+  );
 
   return (
     <div className="space-y-6">
@@ -26,7 +29,9 @@ export default async function AdminProveedoresPage({
           Token de AliExpress guardado correctamente. Los pedidos se enviarán al proveedor de forma automática.
         </div>
       )}
-      {params.error?.startsWith("aliexpress") && params.error !== "aliexpress_manual_token" && (
+      {params.error?.startsWith("aliexpress") &&
+        params.error !== "aliexpress_manual_token" &&
+        !hasAliExpressToken && (
         <div className="rounded-xl bg-red-500/15 border border-red-500/30 text-red-200 px-4 py-3 text-sm flex items-start gap-2">
           <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>
@@ -42,7 +47,7 @@ export default async function AdminProveedoresPage({
           </span>
         </div>
       )}
-      {params.error === "aliexpress_manual_token" && (
+      {params.error === "aliexpress_manual_token" && !hasAliExpressToken && (
         <div className="rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 px-4 py-3 text-sm space-y-2">
           <p className="font-medium">No se pudo obtener el token automáticamente</p>
           {params.message && (
@@ -197,6 +202,20 @@ export default async function AdminProveedoresPage({
                         panel BigBuy → API
                       </a>
                       y pégalo en Configurar API → API Key.
+                    </p>
+                  )}
+                  {p.code?.toLowerCase() === "shein" && !p.apiKey?.trim() && !(p as { accessToken?: string | null }).accessToken?.trim() && (
+                    <p className="text-[10px] text-muted-foreground w-full mb-1">
+                      Shein Open Platform: obtén <strong>API Key o Access Token</strong> en{" "}
+                      <a
+                        href="https://open.sheincorp.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--gold)] hover:underline"
+                      >
+                        open.sheincorp.com
+                      </a>
+                      . Para <strong>importar productos por ID</strong> añade <code className="text-[10px] bg-[var(--elevated)] px-1 rounded">SEARCHAPI_API_KEY</code> en .env (SearchAPI.io).
                     </p>
                   )}
                   <AdminEditProvider providerId={p.id}>

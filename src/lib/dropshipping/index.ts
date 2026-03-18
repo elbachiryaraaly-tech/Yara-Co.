@@ -4,8 +4,9 @@ import { cjAdapter } from "./adapters/cj";
 import { aliexpressAdapter } from "./adapters/aliexpress";
 import { printfulAdapter } from "./adapters/printful";
 import { bigbuyAdapter } from "./adapters/bigbuy";
+import { sheinAdapter } from "./adapters/shein";
 
-const adapters: IDropshippingAdapter[] = [cjAdapter, aliexpressAdapter, printfulAdapter, bigbuyAdapter];
+const adapters: IDropshippingAdapter[] = [cjAdapter, aliexpressAdapter, printfulAdapter, bigbuyAdapter, sheinAdapter];
 
 export type { DropshippingAddress, DropshippingOrderItem, PlaceOrderParams, PlaceOrderResult, DropshippingProviderConfig } from "./types";
 export { validatePlaceOrderParams } from "./validate";
