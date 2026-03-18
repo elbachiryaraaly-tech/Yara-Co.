@@ -163,10 +163,16 @@ export function AdminProductoNuevoForm({
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: form,
+        // NextAuth usa cookies/sesión; explícitamente incluimos credenciales.
+        credentials: "include",
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Error al subir");
-      setValue(`images.${index}.url`, data.url);
+      // Forzar que react-hook-form lo considere (y el input se rellene).
+      setValue(`images.${index}.url`, data.url, { shouldDirty: true, shouldValidate: true });
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Error al subir la imagen");
     } finally {

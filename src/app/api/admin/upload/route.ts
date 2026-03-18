@@ -8,6 +8,24 @@ import path from "path";
 const UPLOAD_DIR = "public/uploads/productos";
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_EXT = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+
+function guessMimeFromName(fileName: string): string | null {
+  const ext = (path.extname(fileName || "") || "").toLowerCase();
+  switch (ext) {
+    case ".jpg":
+    case ".jpeg":
+      return "image/jpeg";
+    case ".png":
+      return "image/png";
+    case ".webp":
+      return "image/webp";
+    case ".gif":
+      return "image/gif";
+    default:
+      return null;
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +52,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    if (!ALLOWED.includes(file.type)) {
+    // Algunos navegadores devuelven `file.type` vacío; inferimos desde la extensión.
+    const inferredMime = file.type?.trim() ? file.type : guessMimeFromName(file.name);
+    if (!inferredMime || !ALLOWED.includes(inferredMime)) {
       return NextResponse.json(
         { error: "Solo imágenes: JPEG, PNG, WebP o GIF" },
         { status: 400 }
@@ -48,9 +68,7 @@ export async function POST(req: Request) {
     }
 
     const ext = path.extname(file.name) || ".jpg";
-    const safeExt = [".jpg", ".jpeg", ".png", ".webp", ".gif"].includes(ext.toLowerCase())
-      ? ext.toLowerCase()
-      : ".jpg";
+    const safeExt = ALLOWED_EXT.includes(ext.toLowerCase()) ? ext.toLowerCase() : ".jpg";
     const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${safeExt}`;
     const dir = path.join(process.cwd(), UPLOAD_DIR);
     await mkdir(dir, { recursive: true });
