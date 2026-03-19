@@ -7,6 +7,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
 import { cn } from "@/lib/utils";
+import { Analytics } from "@vercel/analytics/react";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
             <CartProvider>
               <SiteShell>{children}</SiteShell>
               <Toaster />
+              <Analytics />
             </CartProvider>
           </LocaleProvider>
         </SessionProvider>
